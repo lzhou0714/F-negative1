@@ -8,9 +8,8 @@ class Rounded_Edge extends Shape {
     // Build a donut shape.  An example of a surface of revolution.
     constructor(rows, columns, texture_range) {
         super("position", "normal", "texture_coord");
-        const points = Vector3.cast(
-            [-1.5, 0, 0], [-0.5, 0, 0])
-        defs.Half_Surface_Of_Revolution.insert_transformed_copy_into(this, [rows, columns, points, texture_range]);
+        const points_arr = Vector3.cast([-2, 0, 0], [-1, 0, 0]);
+        defs.Half_Surface_Of_Revolution.insert_transformed_copy_into(this, [rows, columns, points_arr, texture_range]);
     }
 }
 
@@ -28,7 +27,7 @@ class Base_Scene extends Scene {
         this.shapes = {
             'cube': new defs.Cube(),
             'sphere': new defs.Subdivision_Sphere(4),
-            'curve': new Rounded_Edge(30,30),
+            'curve': new Rounded_Edge(50,50),
             'axis': new defs.Axis_Arrows(),
 
         };
@@ -56,7 +55,7 @@ class Base_Scene extends Scene {
             program_state.set_camera(Mat4.translation(5, -10, -30));
         }
         program_state.projection_transform = Mat4.perspective(
-            Math.PI / 4, context.width / context.height, 1, 200);
+            Math.PI / 4, context.width / context.height, 1, 700);
         
         
         // *** Lights: *** Values of vector or point lights.
@@ -245,28 +244,28 @@ export class Assignment2 extends Base_Scene {
         this.shapes.sphere.draw(context, program_state, light_mat, this.materials.flat);
 
         //surroundings
-        let sphereTransform = model_transform.times(Mat4.scale(100,100,100));
+        let sphereTransform = model_transform.times(Mat4.scale(500,500,500));
         this.shapes.sphere.draw(
             context, 
             program_state,
             sphereTransform, 
             this.materials.flat.override(hex_color("87CEEB"))
             );
-        
+            
         //curve front
-        let curve1_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.translation(20,-30,0)).times(Mat4.scale(20,15,10))
+        let curve1_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.translation(30,-100,0)).times(Mat4.scale(20,15,10))
         this.shapes.curve.draw( context, program_state, curve1_transform, this.materials.plastic.override(hex_color("00FF00")));
         
         //left side straight track
-        let straight1_transform = model_transform.times(Mat4.scale(10,0.1,30));
+        let straight1_transform = model_transform.times(Mat4.scale(10,0.1,100));
         this.shapes.cube.draw( context, program_state, straight1_transform, this.materials.plastic.override(hex_color("00FF00")));
         
         //curve back
-        let curve2_transform = model_transform.times(Mat4.rotation(-Math.PI/2,1,0,0)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-20,-30,0)).times(Mat4.scale(20,15,10))
+        let curve2_transform = model_transform.times(Mat4.rotation(-Math.PI/2,1,0,0)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-30,-100,0)).times(Mat4.scale(20,15,10))
         this.shapes.curve.draw( context, program_state, curve2_transform, this.materials.plastic.override(hex_color("00FF00")));
         
         //left side straight track
-        let straight2_transform = model_transform.times(Mat4.translation(40,0,0).times(Mat4.scale(10,0.1,30)));
+        let straight2_transform = model_transform.times(Mat4.translation(60,0,0).times(Mat4.scale(10,0.1,100)));
         this.shapes.cube.draw( context, program_state, straight2_transform, this.materials.plastic.override(hex_color("00FF00")));
         
     }
