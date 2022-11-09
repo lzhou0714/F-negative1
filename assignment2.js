@@ -82,9 +82,9 @@ export class Assignment2 extends Base_Scene {
 		// Transform
 		
 		this.x = 0;
-		this.z = 0;
-		this.y = 1;
-		this.rotx = 0
+		this.z = 1;
+		this.y = 0;
+		this.rotx = 0;
 		this.roty = 0;
 		this.rotz = 0;
 
@@ -229,11 +229,11 @@ export class Assignment2 extends Base_Scene {
 		let camFollowDistance = 16;
 
 		// look_at(P_eye, P_ref, P_top)
-		let init_pos = Mat4.look_at(vec3(this.x + camFollowx * camFollowDistance, this.y + camFollowy * camFollowDistance, 5), vec3(this.x, this.y, this.z), vec3(0, 0, 1));
+		let init_pos = Mat4.look_at(vec3(this.x + camFollowx * camFollowDistance, this.y + camFollowy * camFollowDistance, 5), vec3(this.x,this.y,this.z), vec3(0, 0, 1));
 		
 
         ///////////COMMENTED OUT TO SEE TRACK////////////////
-        // program_state.set_camera(init_pos);
+        program_state.set_camera(init_pos);
 		
 		this.lastrotx = lerp_rotx;
 		// program_state.set_camera(model_transform.times(Mat4.translation(0, 5, -10)).times(Mat4.look_at(vec3(0, 5, 20), vec3(0, 0, 0), vec3(0, 1, 0))));
@@ -241,7 +241,7 @@ export class Assignment2 extends Base_Scene {
 
     draw_environment(context, program_state, model_transform) {
         //light
-        let light_mat = model_transform.times(Mat4.translation(0, 50, 50));
+        let light_mat = model_transform.times(Mat4.translation(50, 50, 50));
         this.shapes.sphere.draw(context, program_state, light_mat, this.materials.flat);
 
         //surroundings
@@ -254,20 +254,20 @@ export class Assignment2 extends Base_Scene {
             );
             
         //curve front
-        let curve1_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0)).times(Mat4.translation(30,-100,0)).times(Mat4.scale(20,15,10))
+        let curve1_transform = model_transform.times(Mat4.rotation(0,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-30,-100,0)).times(Mat4.scale(20,15,10))
         this.shapes.curve.draw( context, program_state, curve1_transform, this.materials.plastic.override(hex_color("00FF00")));
         
         //left side straight track
-        let plane_transform = model_transform.times(Mat4.rotation(-Math.PI/2,1,0,0));
+        let plane_transform = model_transform.times(Mat4.rotation(-Math.PI,0,0,1));
         let straight1_transform = plane_transform.times(Mat4.scale(10,100,1));
         this.shapes.plane.draw( context, program_state, straight1_transform, this.materials.plastic.override(hex_color("00FF00")));
         
         //curve back
-        let curve2_transform = model_transform.times(Mat4.rotation(-Math.PI/2,1,0,0)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-30,-100,0)).times(Mat4.scale(20,15,10))
+        let curve2_transform = model_transform.times(Mat4.rotation(Math.PI,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(30,-100,0)).times(Mat4.scale(20,15,10))
         this.shapes.curve.draw( context, program_state, curve2_transform, this.materials.plastic.override(hex_color("00FF00")));
         
         //left side straight track
-        let straight2_transform = plane_transform.times(Mat4.translation(60,0,0).times(Mat4.scale(10,100,1)));
+        let straight2_transform = plane_transform.times(Mat4.translation(-60,0,0).times(Mat4.scale(10,100,1)));
         this.shapes.plane.draw( context, program_state, straight2_transform, this.materials.plastic.override(hex_color("00FF00")));
         
     }
@@ -283,6 +283,7 @@ export class Assignment2 extends Base_Scene {
 
         this.draw_environment(context, program_state, model_transform);
         //player
+        
 		this.draw_car(context, program_state, model_transform);
 		
         
