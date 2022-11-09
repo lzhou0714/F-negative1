@@ -27,6 +27,7 @@ class Base_Scene extends Scene {
         this.shapes = {
             'cube': new defs.Cube(),
             'sphere': new defs.Subdivision_Sphere(4),
+            'plane' : new defs.Square(),
             'curve': new Rounded_Edge(50,50),
             'axis': new defs.Axis_Arrows(),
 
@@ -257,16 +258,17 @@ export class Assignment2 extends Base_Scene {
         this.shapes.curve.draw( context, program_state, curve1_transform, this.materials.plastic.override(hex_color("00FF00")));
         
         //left side straight track
-        let straight1_transform = model_transform.times(Mat4.scale(10,0.1,100));
-        this.shapes.cube.draw( context, program_state, straight1_transform, this.materials.plastic.override(hex_color("00FF00")));
+        let plane_transform = model_transform.times(Mat4.rotation(-Math.PI/2,1,0,0));
+        let straight1_transform = plane_transform.times(Mat4.scale(10,100,1));
+        this.shapes.plane.draw( context, program_state, straight1_transform, this.materials.plastic.override(hex_color("00FF00")));
         
         //curve back
         let curve2_transform = model_transform.times(Mat4.rotation(-Math.PI/2,1,0,0)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-30,-100,0)).times(Mat4.scale(20,15,10))
         this.shapes.curve.draw( context, program_state, curve2_transform, this.materials.plastic.override(hex_color("00FF00")));
         
         //left side straight track
-        let straight2_transform = model_transform.times(Mat4.translation(60,0,0).times(Mat4.scale(10,0.1,100)));
-        this.shapes.cube.draw( context, program_state, straight2_transform, this.materials.plastic.override(hex_color("00FF00")));
+        let straight2_transform = plane_transform.times(Mat4.translation(60,0,0).times(Mat4.scale(10,100,1)));
+        this.shapes.plane.draw( context, program_state, straight2_transform, this.materials.plastic.override(hex_color("00FF00")));
         
     }
 
