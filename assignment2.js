@@ -56,12 +56,12 @@ class Base_Scene extends Scene {
             program_state.set_camera(Mat4.translation(5, -10, -30));
         }
         program_state.projection_transform = Mat4.perspective(
-            Math.PI / 4, context.width / context.height, 1, 100);
+            Math.PI / 4, context.width / context.height, 1, 200);
         
         
         // *** Lights: *** Values of vector or point lights.
         const light_position = vec4(0, 50, 50, 1);
-        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 100000)];
+        program_state.lights = [new Light(light_position, color(1, 1, 1, 1), 10**10)];
     }
 }
 
