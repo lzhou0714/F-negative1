@@ -320,6 +320,20 @@ const Surface_Of_Revolution = defs.Surface_Of_Revolution =
         }
     }
 
+const Half_Surface_Of_Revolution = defs.Half_Surface_Of_Revolution =
+    class Surface_Of_Revolution extends Grid_Patch {
+        // SURFACE OF REVOLUTION: Produce a curved "sheet" of triangles with rows and columns.
+        // Begin with an input array of points, defining a 1D path curving through 3D space --
+        // now let each such point be a row.  Sweep that whole curve around the Z axis in equal
+        // steps, stopping and storing new points along the way; let each step be a column. Now
+        // we have a flexible "generalized cylinder" spanning an area until total_curvature_angle.
+        constructor(rows, columns, points, texture_coord_range, total_curvature_angle = Math.PI) {
+            const row_operation = i => Grid_Patch.sample_array(points, i),
+                column_operation = (j, p) => Mat4.rotation(total_curvature_angle / columns, 0, 0, 1).times(p.to4(1)).to3();
+
+            super(rows, columns, row_operation, column_operation, texture_coord_range);
+        }
+    }
 
 const Regular_2D_Polygon = defs.Regular_2D_Polygon =
     class Regular_2D_Polygon extends Surface_Of_Revolution {
@@ -360,6 +374,8 @@ const Torus = defs.Torus =
             Surface_Of_Revolution.insert_transformed_copy_into(this, [rows, columns, circle_points, texture_range]);
         }
     }
+
+
 
 const Grid_Sphere = defs.Grid_Sphere =
     class Grid_Sphere extends Shape {
@@ -867,7 +883,7 @@ const Movement_Controls = defs.Movement_Controls =
         }
 
         make_control_panel() {
-            /*
+            
             // make_control_panel(): Sets up a panel of interactive HTML elements, including
             // buttons with key bindings for affecting this scene, and live info readouts.
             this.control_panel.innerHTML += "Click and drag the scene to spin your viewpoint around it.<br>";
@@ -934,7 +950,7 @@ const Movement_Controls = defs.Movement_Controls =
                 }, "#8B8885");
             this.new_line();
 
-            */
+            
         }
 
         first_person_flyaround(radians_per_frame, meters_per_frame, leeway = 70) {
