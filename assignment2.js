@@ -1,8 +1,11 @@
 import {defs, tiny} from './examples/common.js';
 
+
 const {
-    Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light, Shape, Material, Scene,
+    Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light,Texture, Shape, Material, Scene,
 } = tiny;
+
+const {Textured_Phong} = defs
 
 class Rounded_Edge extends Shape {
     // Build a donut shape.  An example of a surface of revolution.
@@ -39,6 +42,17 @@ class Base_Scene extends Scene {
                 {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
             flat: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#ffffff")}),
+            car: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: 0.5, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/stars.png"),
+            }),
+            road: new Material(new Textured_Phong(), {
+                color: hex_color("#ffffff"),
+                ambient: 0.5, diffusivity: 0.1, specularity: 0.1,
+                texture: new Texture("assets/road.jpg"),
+            })
+
         };
         // The white material and basic shader are used for drawing the outline.
         this.white = new Material(new defs.Basic_Shader());
@@ -147,7 +161,7 @@ export class Assignment2 extends Base_Scene {
         this.addHoldKey('s', () => this.vely -= 0.002, "Brake", 125)
         this.addHoldKey('d', () => {
             this.rotx -= Math.PI / 32
-            if(vely > 0){
+            if(this.vely > 0){
                 this.vely -= 0.00075
                 if(this.vely < 0){
                     this.vely = 0
@@ -276,9 +290,7 @@ export class Assignment2 extends Base_Scene {
 			context,
 			program_state,
 			model_transform,
-			this.materials.plastic.override({
-				color: color(1, 0, 0, 1),
-			})
+			this.materials.car
 		); 
 
 		// program_state.set_camera(model_transform.times(Mat4.translation(15, 0, -10)));
@@ -314,20 +326,20 @@ export class Assignment2 extends Base_Scene {
             
         //curve front
         let curve1_transform = model_transform.times(Mat4.rotation(0,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-30,-100,0)).times(Mat4.scale(20,15,10))
-        this.shapes.curve.draw( context, program_state, curve1_transform, this.materials.plastic.override(hex_color("00FF00")));
+        this.shapes.curve.draw( context, program_state, curve1_transform, this.materials.road);
         
         //left side straight track
         let plane_transform = model_transform.times(Mat4.rotation(-Math.PI,0,0,1));
         let straight1_transform = plane_transform.times(Mat4.scale(10,100,1));
-        this.shapes.plane.draw( context, program_state, straight1_transform, this.materials.plastic.override(hex_color("00FF00")));
+        this.shapes.plane.draw( context, program_state, straight1_transform, this.materials.road);
         
         //curve back
         let curve2_transform = model_transform.times(Mat4.rotation(Math.PI,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(30,-100,0)).times(Mat4.scale(20,15,10))
-        this.shapes.curve.draw( context, program_state, curve2_transform, this.materials.plastic.override(hex_color("00FF00")));
+        this.shapes.curve.draw( context, program_state, curve2_transform, this.materials.road);
         
         //left side straight track
         let straight2_transform = plane_transform.times(Mat4.translation(-60,0,0).times(Mat4.scale(10,100,1)));
-        this.shapes.plane.draw( context, program_state, straight2_transform, this.materials.plastic.override(hex_color("00FF00")));
+        this.shapes.plane.draw( context, program_state, straight2_transform, this.materials.road);
         
     }
 
