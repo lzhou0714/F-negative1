@@ -94,6 +94,9 @@ export class Assignment2 extends Base_Scene {
 		this.velx = 0;
 		this.vely = 0;
 		this.velz = 0;
+
+        // Key presses
+        this.keyListeners = {}
     }
     
     set_colors() {
@@ -125,24 +128,80 @@ export class Assignment2 extends Base_Scene {
         });
 
 
-		// Movement
-		this.key_triggered_button("Accelerate", ["w"], () => {
-			this.vely += 0.002;
-        });
-		this.key_triggered_button("Brake", ["s"], () => {
-			this.vely -= 0.002;
-        });
-		this.key_triggered_button("Steer Left", ["a"], () => {
-			// this.x -= 0.2;
-			this.rotx += Math.PI / 32;
-        });
-		this.key_triggered_button("Steer Right", ["d"], () => {
-			// this.x += 0.2;
-			this.rotx -= Math.PI / 32;
-        });
+        this.addHoldKey('w', () => this.vely += 0.002, 'Accelerate', 125)
 
+        window.setInterval(() => {
+            if(!this.keyListeners['w'] && this.vely > 0){
+                this.vely -= 0.005
+                if(this.vely < 0){
+                    this.vely = 0
+                }
+            } else if(!this.keyListeners['d'] && this.vely < 0){
+                this.vely += 0.005
+                if(this.vely > 0){
+                    this.vely = 0
+                }
+            }
+
+        }, 500)
+        this.addHoldKey('s', () => this.vely -= 0.002, "Brake", 125)
+        this.addHoldKey('d', () => {
+            this.rotx -= Math.PI / 32
+            if(vely > 0){
+                this.vely -= 0.00075
+                if(this.vely < 0){
+                    this.vely = 0
+                }
+            }
+            
+        }, 'Steer Right', 125)
+        this.addHoldKey('a', () => {
+            this.rotx += Math.PI / 32
+            if(this.vely > 0){
+                this.vely -= 0.00075
+                if(this.vely < 0){
+                    this.vely = 0
+                }
+            } else if (this.vely < 0){
+                this.vely += 0.00075
+                if(this.vely > 0){
+                    this.vely = 0
+                }
+            }
+        }, 'Steer Left', 125)
        
+
     }
+
+    // addHoldKey - add a key to the control panel that is meant for holding down
+    // Parameters
+    // key - key pressed
+    // callback - what you want to happen when the key is held down
+    // name - name you want to give the button
+    // interval - how often you want the callback to be called in ms
+    addHoldKey(key, callback, name, interval = 100) {
+        this.key_triggered_button(name, [key], () => {})
+
+        window.setInterval(() => {
+            if(this.keyListeners[name]) {
+                callback()
+            }
+        }, interval)
+
+        document.addEventListener('keydown', (e) => {
+            
+            if(e.key === key){
+                this.keyListeners[name] = true;
+            }
+        })
+
+        document.addEventListener('keyup', (e) => {
+            if(e.key == key){
+                this.keyListeners[name] = false;
+            }
+        })
+    }
+
 
     draw_box(context, program_state, model_transform, index) {
         
