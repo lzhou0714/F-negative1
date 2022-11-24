@@ -7,6 +7,23 @@ const {
 
 const {Textured_Phong} = defs
 
+class Collider {}
+
+// Rectangular colliders 
+class Box_Collider extends Collider {
+    constructor(x, y, width, length) {
+
+    }
+}
+
+// 90 degree curve colliders 
+class Curve_Collider extends Collider {
+    // Note - cartesian quadrants: 1 = top right, 2 = top left, 3 = bot left, 4 = bot right
+    constructor(x, y, radius, quadrant) {
+
+    }
+}
+
 class Rounded_Edge extends Shape {
     // Build a donut shape.  An example of a surface of revolution.
     constructor(rows, columns, texture_range) {
@@ -108,6 +125,9 @@ export class Assignment2 extends Base_Scene {
 		this.velx = 0;
 		this.vely = 0;
 		this.velz = 0;
+
+        // Colliders
+
 
         // Key presses
         this.keyListeners = {}
@@ -267,6 +287,10 @@ export class Assignment2 extends Base_Scene {
         return model_transform.times(Mat4.scale(1, 1/1.5, 1));  // Unscale before return
     }
 
+    detect_collision(deltax, deltay) {
+        
+    }
+
 	draw_car(context, program_state, model_transform) {
 		// model_transform = model_transform.times(Mat4.translation(this.x, this.y, this.z));
 		this.vely = Math.max(Math.min(this.vely, 0.06), -0.01);
@@ -279,6 +303,8 @@ export class Assignment2 extends Base_Scene {
 		let deltax = this.vely * program_state.animation_delta_time * Math.sin(-1 * lerp_rotx);
 		let deltay = this.vely * program_state.animation_delta_time * Math.cos(lerp_rotx);
 		
+
+        // Actual movement happens - Collision detection will occur here
 		this.x += deltax;
 		this.y += deltay;
 		// this.z += this.velz * program_state.animation_delta_time
