@@ -1,5 +1,5 @@
 import {defs, tiny} from './examples/common.js';
-
+import {Shape_From_File} from './examples/obj-file-demo.js';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light,Texture, Shape, Material, Scene,
@@ -50,6 +50,7 @@ class Base_Scene extends Scene {
             'plane' : new defs.Square(),
             'curve': new Rounded_Edge(50,50),
             'axis': new defs.Axis_Arrows(),
+            'kart': new Shape_From_File("assets/kart/kart.obj"),
 
         };
 
@@ -59,17 +60,27 @@ class Base_Scene extends Scene {
                 {ambient: .4, diffusivity: .6, color: hex_color("#ffffff")}),
             flat: new Material(new defs.Phong_Shader(),
                 {ambient: 1, diffusivity: 0, specularity: 0, color: hex_color("#ffffff")}),
-            car: new Material(new Textured_Phong(), {
-                color: hex_color("#ffffff"),
-                ambient: 0.5, diffusivity: 0.1, specularity: 0.1,
-                texture: new Texture("assets/stars.png"),
-            }),
+
             road: new Material(new Textured_Phong(), {
                 color: hex_color("#ffffff"),
                 ambient: 0.5, diffusivity: 0.1, specularity: 0.1,
                 texture: new Texture("assets/road.jpg"),
-            })
-
+            }),
+            kart: new Material(new Textured_Phong(), {
+                color: hex_color("#000000"),
+                ambient: 1, diffusivity: 0.2, specularity: 1, 
+                texture: new Texture("assets/kart/kart_b_bc.png")
+            }),
+            kartM: new Material(new Textured_Phong(), {
+                color: hex_color("#000000"),
+                ambient: 0.1, diffusivity: 0.2, specularity: 1, 
+                texture: new Texture("assets/kart/kart_m.png")
+            }),
+            kartR: new Material(new Textured_Phong(), {
+                color: hex_color("#000000"),
+                ambient: 1, diffusivity: 0, specularity: 0, 
+                texture: new Texture("assets/kart/kart_r.png")
+            }),
         };
         // The white material and basic shader are used for drawing the outline.
         this.white = new Material(new defs.Basic_Shader());
@@ -310,14 +321,28 @@ export class Assignment2 extends Base_Scene {
 		// this.z += this.velz * program_state.animation_delta_time
 		
 		model_transform = Mat4.identity();
+        // model_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0))
+        model_transform = model_transform.times(Mat4.translation(0, 0, -0.6))
 		model_transform = model_transform.times(Mat4.translation(this.x, this.y, this.z));
 		model_transform = model_transform.times(Mat4.rotation(lerp_rotx, 0, 0, 1));
-		this.shapes.cube.draw(
+		
+        for (let i of [0,1,2]){
+        let materials;
+        //load texture and normal map for car
+        if (i == 0)
+            materials = this.materials.kart;
+        else if (i==1)
+            materials = this.materials.kartM;
+        else
+            materials = this.materials.kartR;
+
+        this.shapes.kart.draw(
 			context,
 			program_state,
 			model_transform,
-			this.materials.car
+			materials
 		); 
+        }
 
 		// program_state.set_camera(model_transform.times(Mat4.translation(15, 0, -10)));
 
@@ -330,7 +355,7 @@ export class Assignment2 extends Base_Scene {
 		
 
         ///////////COMMENTED OUT TO SEE TRACK////////////////
-        program_state.set_camera(init_pos);
+        // program_state.set_camera(init_pos);
 		
 		this.lastrotx = lerp_rotx;
 		// program_state.set_camera(model_transform.times(Mat4.translation(0, 5, -10)).times(Mat4.look_at(vec3(0, 5, 20), vec3(0, 0, 0), vec3(0, 1, 0))));
@@ -350,8 +375,8 @@ export class Assignment2 extends Base_Scene {
             this.materials.flat.override(hex_color("87CEEB"))
             );
             
-        //curve front
-        let curve1_transform = model_transform.times(Mat4.rotation(0,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-30,-100,0)).times(Mat4.scale(20,15,10))
+        //curve back
+        let curve1_transform = model_transform.times(Mat4.rotation(0,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-30,-100,0)).times(Mat4.scale(20,20,10))
         this.shapes.curve.draw( context, program_state, curve1_transform, this.materials.road);
         
         //left side straight track
@@ -359,8 +384,8 @@ export class Assignment2 extends Base_Scene {
         let straight1_transform = plane_transform.times(Mat4.scale(10,100,1));
         this.shapes.plane.draw( context, program_state, straight1_transform, this.materials.road);
         
-        //curve back
-        let curve2_transform = model_transform.times(Mat4.rotation(Math.PI,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(30,-100,0)).times(Mat4.scale(20,15,10))
+        //curve front
+        let curve2_transform = model_transform.times(Mat4.rotation(Math.PI,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(30,-100,0)).times(Mat4.scale(20,20,10))
         this.shapes.curve.draw( context, program_state, curve2_transform, this.materials.road);
         
         //left side straight track
