@@ -7,20 +7,90 @@ const {
 
 const {Textured_Phong} = defs
 
-class Collider {}
+// All colliders treat the car as a sphere collider
+class Collider {
+}
 
 // Rectangular colliders 
 class Box_Collider extends Collider {
-    constructor(x, y, width, length) {
+    constructor(x, y, xlen, ylen) {
+        super();    
+        this.x = x;
+        this.y = y;
+        this.w = xlen;
+        this.l = ylen;
+    }
 
+    check_collision(x, y) {
+        let resx = x;
+        let resy = y;
+        if (this.x < x && this.x + this.w > x && this.y < y && this.y + this.l > y) {
+            if (Math.min(x - this.x, this.x + this.w - x) < Math.min(y - this.y, this.y + this.l - y)) {  // Get axis closest to edge of shape
+                if (x - this.x > this.w / 2) { // Right side
+                    resx = this.x + this.w;
+                } else {  // Left side
+                    resx = this.x;
+                }
+            } else {
+                if (y - this.y > this.l / 2) { // Right side
+                    resy = this.y + this.l;
+                } else {  // Left side
+                    resy = this.y;
+                }
+            }
+        }
+
+        return {resx: resx, resy: resy}
     }
 }
 
 // 90 degree curve colliders 
 class Curve_Collider extends Collider {
     // Note - cartesian quadrants: 1 = top right, 2 = top left, 3 = bot left, 4 = bot right
-    constructor(x, y, radius, quadrant) {
+    constructor(x, y, radius, thickness, quadrant) {
+        super();
+        this.x = x;
+        this.y = y;
+        this.r = radius;  // How big the curve is
+        this.t = thickness;  // How thick the curve line itself is
+        this.quad = quadrant;
 
+    }
+
+    check_collision(x, y) {
+        // console.log("checking");
+        if (this.quad == 1) {
+            if (!(x > this.x && y > this.y)) {
+                return {resx: x, resy: y};
+            }
+        } else if (this.quad == 2) {
+            if (!(x < this.x && y > this.y)) {
+                return {resx: x, resy: y};
+            }
+        } else if (this.quad == 3) {
+            if (!(x < this.x && y < this.y)) {
+                return {resx: x, resy: y};
+            }
+        } else {
+            if (!(x > this.x && y < this.y)) {
+                return {resx: x, resy: y};
+            }
+        }
+        // Get distance to center of curvature
+        let distance = Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2))
+        // console.log(this.r);
+        // console.log(Math.abs(this.r - distance) < this.t);
+        if (Math.abs(this.r - distance) < this.t) {  // Collided
+            let ux = (x - this.x) / distance;
+            let uy = (y - this.y) / distance;
+            if (this.r - distance < 0) {  // Outside the curve
+                return {resx: ux * (this.r + this.t) + this.x, resy: uy * (this.r + this.t) + this.y};
+            } else {  // Inside the curve
+                return {resx: ux * (this.r - this.t) + this.x, resy: uy * (this.r - this.t) + this.y};
+            }
+        } else {
+            return {resx: x, resy: y};
+        }
     }
 }
 
@@ -127,7 +197,7 @@ export class Assignment2 extends Base_Scene {
 		this.velz = 0;
 
         // Colliders
-
+        this.colliders = new Array();
 
         // Key presses
         this.keyListeners = {}
@@ -287,8 +357,23 @@ export class Assignment2 extends Base_Scene {
         return model_transform.times(Mat4.scale(1, 1/1.5, 1));  // Unscale before return
     }
 
-    detect_collision(deltax, deltay) {
-        
+    move_with_collision(deltax, deltay) {
+        let newx = this.x + deltax;
+        let newy = this.y + deltay;
+        let len = this.colliders.length;
+        for (let i = 0; i < len; i++) {
+            // console.log(this.colliders[i]);
+            let res = this.colliders[i].check_collision(newx, newy);
+            
+            if (res.resx != newx || res.resy != newy) {
+                console.log(res);
+                this.x = res.resx;
+                this.y = res.resy;
+                return;
+            }
+        }
+        this.x = newx;
+        this.y = newy;
     }
 
 	draw_car(context, program_state, model_transform) {
@@ -305,8 +390,9 @@ export class Assignment2 extends Base_Scene {
 		
 
         // Actual movement happens - Collision detection will occur here
-		this.x += deltax;
-		this.y += deltay;
+		//this.x += deltax;
+		//this.y += deltay;
+        this.move_with_collision(deltax, deltay);
 		// this.z += this.velz * program_state.animation_delta_time
 		
 		model_transform = Mat4.identity();
@@ -351,22 +437,52 @@ export class Assignment2 extends Base_Scene {
             );
             
         //curve front
-        let curve1_transform = model_transform.times(Mat4.rotation(0,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-30,-100,0)).times(Mat4.scale(20,15,10))
+        let curve1_transform = model_transform.times(Mat4.rotation(0,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(-30,-100,0)).times(Mat4.scale(20,20,10))
         this.shapes.curve.draw( context, program_state, curve1_transform, this.materials.road);
         
+        let curve1l_collider = new Curve_Collider(30, -100, 41, 2, 3);
+        let curve1r_collider = new Curve_Collider(30, -100, 41, 2, 4);
+        this.colliders[0] = curve1l_collider;
+        this.colliders[1] = curve1r_collider;
+
+        let curve2l_collider = new Curve_Collider(30, -100, 19, 2, 3);
+        let curve2r_collider = new Curve_Collider(30, -100, 19, 2, 4);
+        this.colliders[2] = curve2l_collider;
+        this.colliders[3] = curve2r_collider;
+        
+        //curve back
+        let curve2_transform = model_transform.times(Mat4.rotation(Math.PI,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(30,-100,0)).times(Mat4.scale(20,20,10))
+        this.shapes.curve.draw( context, program_state, curve2_transform, this.materials.road);
+        
+        let curve3l_collider = new Curve_Collider(30, 100, 41, 2, 2);
+        let curve3r_collider = new Curve_Collider(30, 100, 41, 2, 1);
+        this.colliders[4] = curve3l_collider;
+        this.colliders[5] = curve3r_collider;
+
+        let curve4l_collider = new Curve_Collider(30, 100, 19, 2, 2);
+        let curve4r_collider = new Curve_Collider(30, 100, 19, 2, 1);
+        this.colliders[6] = curve4l_collider;
+        this.colliders[7] = curve4r_collider;
+
         //left side straight track
         let plane_transform = model_transform.times(Mat4.rotation(-Math.PI,0,0,1));
         let straight1_transform = plane_transform.times(Mat4.scale(10,100,1));
         this.shapes.plane.draw( context, program_state, straight1_transform, this.materials.road);
-        
-        //curve back
-        let curve2_transform = model_transform.times(Mat4.rotation(Math.PI,0,0,1)).times(Mat4.rotation(Math.PI,0,1,0)).times(Mat4.translation(30,-100,0)).times(Mat4.scale(20,15,10))
-        this.shapes.curve.draw( context, program_state, curve2_transform, this.materials.road);
-        
+        let track1l_collider = new Box_Collider(-11, -101, 2, 202);
+        let track1r_collider = new Box_Collider(9, -101, 2, 202);
+        this.colliders[8] = track1l_collider;
+        this.colliders[9] = track1r_collider;
+
+
         //left side straight track
         let straight2_transform = plane_transform.times(Mat4.translation(-60,0,0).times(Mat4.scale(10,100,1)));
         this.shapes.plane.draw( context, program_state, straight2_transform, this.materials.road);
-        
+        let track2l_collider = new Box_Collider(49, -101, 2, 202);
+        let track2r_collider = new Box_Collider(69, -101, 2, 202);
+        this.colliders[10] = track2l_collider;
+        this.colliders[11] = track2r_collider;
+
+
     }
 
 
