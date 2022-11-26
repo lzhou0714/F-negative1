@@ -1,0 +1,116 @@
+/* 
+Style inspired by Adam Argyle from https://web.dev/building-a-3d-game-menu-component/
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Fira+Code:wght@300;400;700&family=Red+Hat+Mono&family=Roboto+Mono&display=swap');
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+:root {
+	--main-color: hsl(232 100% 50%);
+	--main-bg-color: hsl(232 100% 50% / 50%);
+	--main-bg-hover: hsl(232 100% 50% / 60%);
+	--main-bg-shadow: hsl(232 100% 10% / 25%);
+}
+
+html {
+	block-size: 100%;
+	background: conic-gradient(
+		at -10% 50%,
+		#212529,
+		50%,
+		#495057,
+		#212529
+	);
+}
+
+body {
+	min-block-size: 100%;
+
+	display: grid;
+	place-content: center;
+
+	perspective: 40vw;
+	font-family: Audiowide;
+}
+
+.maps-menu {
+	list-style: none;
+
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2.5vh;
+	transform-style: preserve-3d;
+}
+
+.maps-menu h1 {
+	font-size: 6rem;
+	font-weight: 600;
+	background-image: radial-gradient(
+		ellipse 50% 35% at 50% 50%,
+		#2f8e9f,
+		transparent
+	);
+	text-transform: uppercase;
+	font-size: 6em;
+	color: #e6faff;
+	text-shadow: 0 0 0.6rem #e6faff, 0 0 1.5rem #65c9ff,
+		-0.2rem 0.1rem 1rem #6565ff, 0.2rem 0.1rem 1rem #6598ff,
+		0 -0.5rem 2rem #246dff, 0 0.5rem 3rem #2b24ff;
+}
+
+.maps-menu li {
+	/* change display type from list-item */
+	display: inline-flex;
+
+	/* create context for button pseudos */
+	position: relative;
+
+	/* create 3D space context */
+	transform-style: preserve-3d;
+}
+
+.maps-menu button {
+	appearance: none;
+	outline: none;
+	border: none;
+
+	font-family: Audiowide;
+	background-color: var(--main-bg-color);
+	color: white;
+	text-shadow: var(--main-bg-shadow);
+
+	text-shadow: 0 1px 1px var(--main-bg-shadow);
+	font-size: min(5vmin, 3rem);
+	padding-block: 0.75ch;
+	padding-inline: 2ch;
+	border-radius: 5px 20px;
+	cursor: pointer;
+}
+
+.maps-menu button::after,
+.maps-menu button::before {
+	/* create empty element */
+	content: '';
+	opacity: 0.8;
+
+	/* cover the parent (button) */
+	position: absolute;
+	inset: 0;
+
+	/* style the element for border accents */
+	border: 1px solid var(--main-color);
+	border-radius: 5px 20px;
+}
+.maps-menu button:is(:hover, :focus-visible):not(:active) {
+	background-color: var(--main-bg-hover);
+}
+
+.maps-menu button::before {
+	box-shadow: 0 0 25px var(--main-color),
+		inset 0 0 25px var(--main-color);
+}
