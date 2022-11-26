@@ -1,6 +1,6 @@
 import { defs, tiny } from '../examples/common.js';
-import { Box_Collider } from '../colliders/BoxCollider.js';
-import { Curve_Collider } from '../colliders/CurveCollider.js';
+import { Shape_From_File } from '../examples/obj-file-demo.js';
+import { Text_Line } from '../examples/text-demo.js';
 
 const {
 	Vector,
@@ -21,7 +21,18 @@ const {
 
 const { Textured_Phong } = defs;
 
-// All colliders treat the car as a sphere collider
+class Collider {}
+
+// Rectangular colliders
+class Box_Collider extends Collider {
+	constructor(x, y, width, length) {}
+}
+
+// 90 degree curve colliders
+class Curve_Collider extends Collider {
+	// Note - cartesian quadrants: 1 = top right, 2 = top left, 3 = bot left, 4 = bot right
+	constructor(x, y, radius, quadrant) {}
+}
 
 class Rounded_Edge extends Shape {
 	// Build a donut shape.  An example of a surface of revolution.
@@ -32,29 +43,6 @@ class Rounded_Edge extends Shape {
 			this,
 			[rows, columns, points_arr, texture_range]
 		);
-	}
-}
-
-class Particle {
-	constructor(vx, vy, vz) {
-		this.vx = vx;
-		this.vy = vy;
-		this.vz = vz;
-		this.x = 0;
-		this.y = 0;
-		this.z = 0;
-		this.age = 0;
-	}
-
-	move(anim_time) {
-		this.x += this.vx * anim_time;
-		this.y += this.vy * anim_time;
-		this.z += this.vz * anim_time;
-		this.age += anim_time;
-	}
-
-	get_info() {
-		return { x: this.x, y: this.y, z: this.z, age: this.age };
 	}
 }
 
@@ -73,6 +61,10 @@ class Base_Scene extends Scene {
 			sphere: new defs.Subdivision_Sphere(4),
 			plane: new defs.Square(),
 			curve: new Rounded_Edge(50, 50),
+			axis: new defs.Axis_Arrows(),
+			kart: new Shape_From_File('../assets/kart/kart.obj'),
+			coin: new Shape_From_File('../assets/collectibles/coin.obj'),
+			text: new Text_Line(1),
 		};
 
 		// *** Materials
@@ -88,19 +80,47 @@ class Base_Scene extends Scene {
 				specularity: 0,
 				color: hex_color('#ffffff'),
 			}),
-			car: new Material(new Textured_Phong(), {
-				color: hex_color('#ffffff'),
-				ambient: 0.5,
-				diffusivity: 0.1,
-				specularity: 0.1,
-				texture: new Texture('assets/stars.png'),
-			}),
+
 			road: new Material(new Textured_Phong(), {
 				color: hex_color('#ffffff'),
 				ambient: 0.5,
 				diffusivity: 0.1,
 				specularity: 0.1,
 				texture: new Texture('assets/road.jpg'),
+			}),
+			kart: new Material(new Textured_Phong(), {
+				color: hex_color('#000000'),
+				ambient: 1,
+				diffusivity: 0.2,
+				specularity: 1,
+				texture: new Texture('assets/kart/kart_b_bc.png'),
+			}),
+			kartM: new Material(new Textured_Phong(), {
+				color: hex_color('#000000'),
+				ambient: 0.1,
+				diffusivity: 0.2,
+				specularity: 1,
+				texture: new Texture('assets/kart/kart_m.png'),
+			}),
+			kartR: new Material(new Textured_Phong(), {
+				color: hex_color('#000000'),
+				ambient: 1,
+				diffusivity: 0,
+				specularity: 0,
+				texture: new Texture('assets/kart/kart_r.png'),
+			}),
+
+			coin: new Material(new defs.Phong_Shader(), {
+				color: hex_color('F7FF00'),
+				ambient: 0.7,
+				diffusivity: 0.5,
+				specularity: 1,
+			}),
+			text: new Material(new defs.Phong_Shader(1), {
+				ambient: 1,
+				diffusivity: 0,
+				specularity: 0,
+				texture: new Texture('assets/text.png'),
 			}),
 		};
 		// The white material and basic shader are used for drawing the outline.
@@ -166,7 +186,10 @@ export class GameMap extends Base_Scene {
 		this.velz = 0;
 
 		// Colliders
-		this.colliders = new Array();
+		this.num_coins = 5;
+		this.rad = 1.25;
+		this.coin_collected = new Array(this.num_coins).fill(false);
+		this.score = 0;
 
 		// Key presses
 		this.keyListeners = {};
@@ -247,11 +270,6 @@ export class GameMap extends Base_Scene {
 					if (this.vely < 0) {
 						this.vely = 0;
 					}
-				} else if (this.vely < 0) {
-					this.vely += 0.00075;
-					if (this.vely > 0) {
-						this.vely = 0;
-					}
 				}
 			},
 			'Steer Right',
@@ -286,6 +304,7 @@ export class GameMap extends Base_Scene {
 	// interval - how often you want the callback to be called in ms
 	addHoldKey(key, callback, name, interval = 100) {
 		this.key_triggered_button(name, [key], () => {});
+
 		window.setInterval(() => {
 			if (this.keyListeners[name]) {
 				callback();
@@ -324,7 +343,6 @@ export class GameMap extends Base_Scene {
 			.times(Mat4.rotation(angle, 45, 0, 1))
 			.times(Mat4.translation(1, 1.5, 0))
 			.times(Mat4.scale(1, 1.5, 1)); // Scale the size (Req 7)
-
 		if (!this.outline) {
 			if (index % 2 != 0) {
 				this.shapes.triangle.draw(
@@ -358,25 +376,41 @@ export class GameMap extends Base_Scene {
 
 		return model_transform.times(Mat4.scale(1, 1 / 1.5, 1)); // Unscale before return
 	}
-
-	move_with_collision(deltax, deltay) {
-		let newx = this.x + deltax;
-		let newy = this.y + deltay;
-		let len = this.colliders.length;
-		for (let i = 0; i < len; i++) {
-			// console.log(this.colliders[i]);
-			let res = this.colliders[i].check_collision(newx, newy);
-
-			if (res.resx != newx || res.resy != newy) {
-				console.log(res);
-				this.x = res.resx;
-				this.y = res.resy;
-				return;
-			}
-		}
-		this.x = newx;
-		this.y = newy;
+	draw_coins(context, program_state, model_transform) {
+		this.shapes.coin.draw(
+			context,
+			program_state,
+			model_transform,
+			this.materials.coin
+		);
 	}
+
+	detect_collision(deltax, deltay) {}
+	sphere_collider(radius, x, y) {
+		let dist = Math.sqrt(
+			Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2)
+		);
+		console.log(dist);
+		if (dist < radius + this.rad) {
+			return true;
+		}
+		return false;
+	}
+
+	collect_coin(radius, x, y, index) {
+		if (this.sphere_collider(radius, x, y)) {
+			this.score += 1;
+			this.coin_collected[index] = true;
+		}
+	}
+
+	// draw_text (context, program_state, model_transform) {
+	//     model_transform = model_transform.times(Mat4.rotation(Math.PI/2, 1, 0, 0))
+
+	//     let text = 'Score: ' + this.score;
+	//     this.shapes.text.set_string(text, context.context);
+	//     this.shapes.text.draw(context, program_state, model_transform, this.materials.text);
+	// }
 
 	draw_car(context, program_state, model_transform) {
 		// model_transform = model_transform.times(Mat4.translation(this.x, this.y, this.z));
@@ -398,24 +432,36 @@ export class GameMap extends Base_Scene {
 			Math.cos(lerp_rotx);
 
 		// Actual movement happens - Collision detection will occur here
-		//this.x += deltax;
-		//this.y += deltay;
-		this.move_with_collision(deltax, deltay);
+		this.x += deltax;
+		this.y += deltay;
 		// this.z += this.velz * program_state.animation_delta_time
 
 		model_transform = Mat4.identity();
+		// model_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0))
+		model_transform = model_transform.times(
+			Mat4.translation(0, 0, -0.45)
+		);
 		model_transform = model_transform.times(
 			Mat4.translation(this.x, this.y, this.z)
 		);
 		model_transform = model_transform.times(
 			Mat4.rotation(lerp_rotx, 0, 0, 1)
 		);
-		this.shapes.cube.draw(
-			context,
-			program_state,
-			model_transform,
-			this.materials.car
-		);
+
+		for (let i of [0, 1, 2]) {
+			let materials;
+			//load texture and normal map for car
+			if (i == 0) materials = this.materials.kart;
+			else if (i == 1) materials = this.materials.kartM;
+			else materials = this.materials.kartR;
+
+			this.shapes.kart.draw(
+				context,
+				program_state,
+				model_transform,
+				materials
+			);
+		}
 
 		// program_state.set_camera(model_transform.times(Mat4.translation(15, 0, -10)));
 
@@ -464,7 +510,7 @@ export class GameMap extends Base_Scene {
 			this.materials.flat.override(hex_color('87CEEB'))
 		);
 
-		//curve front
+		//curve back
 		let curve1_transform = model_transform
 			.times(Mat4.rotation(0, 0, 0, 1))
 			.times(Mat4.rotation(Math.PI, 0, 1, 0))
@@ -476,39 +522,6 @@ export class GameMap extends Base_Scene {
 			curve1_transform,
 			this.materials.road
 		);
-
-		let curve1l_collider = new Curve_Collider(30, -100, 41, 2, 3);
-		let curve1r_collider = new Curve_Collider(30, -100, 41, 2, 4);
-		this.colliders[0] = curve1l_collider;
-		this.colliders[1] = curve1r_collider;
-
-		let curve2l_collider = new Curve_Collider(30, -100, 19, 2, 3);
-		let curve2r_collider = new Curve_Collider(30, -100, 19, 2, 4);
-		this.colliders[2] = curve2l_collider;
-		this.colliders[3] = curve2r_collider;
-
-		//curve back
-		let curve2_transform = model_transform
-			.times(Mat4.rotation(Math.PI, 0, 0, 1))
-			.times(Mat4.rotation(Math.PI, 0, 1, 0))
-			.times(Mat4.translation(30, -100, 0))
-			.times(Mat4.scale(20, 20, 10));
-		this.shapes.curve.draw(
-			context,
-			program_state,
-			curve2_transform,
-			this.materials.road
-		);
-
-		let curve3l_collider = new Curve_Collider(30, 100, 41, 2, 2);
-		let curve3r_collider = new Curve_Collider(30, 100, 41, 2, 1);
-		this.colliders[4] = curve3l_collider;
-		this.colliders[5] = curve3r_collider;
-
-		let curve4l_collider = new Curve_Collider(30, 100, 19, 2, 2);
-		let curve4r_collider = new Curve_Collider(30, 100, 19, 2, 1);
-		this.colliders[6] = curve4l_collider;
-		this.colliders[7] = curve4r_collider;
 
 		//left side straight track
 		let plane_transform = model_transform.times(
@@ -523,12 +536,21 @@ export class GameMap extends Base_Scene {
 			straight1_transform,
 			this.materials.road
 		);
-		let track1l_collider = new Box_Collider(-11, -101, 2, 202);
-		let track1r_collider = new Box_Collider(9, -101, 2, 202);
-		this.colliders[8] = track1l_collider;
-		this.colliders[9] = track1r_collider;
 
-		//right side straight track
+		//curve front
+		let curve2_transform = model_transform
+			.times(Mat4.rotation(Math.PI, 0, 0, 1))
+			.times(Mat4.rotation(Math.PI, 0, 1, 0))
+			.times(Mat4.translation(30, -100, 0))
+			.times(Mat4.scale(20, 20, 10));
+		this.shapes.curve.draw(
+			context,
+			program_state,
+			curve2_transform,
+			this.materials.road
+		);
+
+		//left side straight track
 		let straight2_transform = plane_transform.times(
 			Mat4.translation(-60, 0, 0).times(Mat4.scale(10, 100, 1))
 		);
@@ -538,21 +560,46 @@ export class GameMap extends Base_Scene {
 			straight2_transform,
 			this.materials.road
 		);
-		let track2l_collider = new Box_Collider(49, -101, 2, 202);
-		let track2r_collider = new Box_Collider(69, -101, 2, 202);
-		this.colliders[10] = track2l_collider;
-		this.colliders[11] = track2r_collider;
 	}
-
-	spawn_particles() {}
 
 	display(context, program_state) {
 		super.display(context, program_state);
 		const blue = hex_color('#1a9ffa');
+		let t, dt;
+		(t = program_state.animation_time / 1000),
+			(dt = program_state.animation_delta_time / 1000);
 		let model_transform = Mat4.identity();
+
+		//for reference
+		this.shapes.axis.draw(
+			context,
+			program_state,
+			model_transform,
+			this.materials.plastic
+		);
+
 		this.draw_environment(context, program_state, model_transform);
 		//player
 
 		this.draw_car(context, program_state, model_transform);
+
+		//radius of coin = 1.3
+		let cy = 20,
+			cx = 0;
+		let coin_init = model_transform.times(
+			Mat4.translation(cx, cy, 1.35)
+		);
+		let coin_pos = new Array(this.num_coins).fill(coin_init);
+		for (let i = 0; i < this.num_coins; i++) {
+			coin_pos[i] = coin_pos[i].times(Mat4.translation(0, 5 * i, 0));
+			cy += i * 5;
+			coin_pos[i] = coin_pos[i].times(Mat4.rotation(t, 0, 0, 1));
+			this.collect_coin(1.3, cx, cy, i);
+			if (!this.coin_collected[i]) {
+				this.draw_coins(context, program_state, coin_pos[i]);
+			}
+		}
+
+		// this.draw_text(context, program_state, model_transform);
 	}
 }
