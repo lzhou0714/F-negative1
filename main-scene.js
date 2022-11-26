@@ -1,6 +1,6 @@
-import { defs, tiny } from './examples/common.js';
+import { defs, tiny } from './tiny-graphics-stuff/common.js';
 
-import { Transforms_Sandbox } from './examples/transforms-sandbox.js';
+import { Transforms_Sandbox } from './tiny-graphics-stuff/transforms-sandbox.js';
 
 // Pull these names into this module's scope for convenience:
 const {

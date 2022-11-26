@@ -1,6 +1,6 @@
-import { defs, tiny } from '../examples/common.js';
-import { Shape_From_File } from '../examples/obj-file-demo.js';
-import { Text_Line } from '../examples/text-demo.js';
+import { defs, tiny } from '../tiny-graphics-stuff/common.js';
+import { Shape_From_File } from '../tiny-graphics-stuff/obj-file-demo.js';
+import { Text_Line } from '../tiny-graphics-stuff/text-demo.js';
 
 const {
 	Vector,
