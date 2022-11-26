@@ -1,11 +1,26 @@
-import {defs, tiny} from './examples/common.js';
+import { defs, tiny } from './examples/common.js';
 
-import {Transforms_Sandbox} from "./examples/transforms-sandbox.js"
-import {Assignment2} from "./assignment2.js"
+import { Transforms_Sandbox } from './examples/transforms-sandbox.js';
+import { Assignment2 } from './assignment2.js';
 // Pull these names into this module's scope for convenience:
 const {
-    Vector, Vector3, vec, vec3, vec4, color, Matrix, Mat4, Light, Shape, Material, Shader, Texture, Scene,
-    Canvas_Widget, Code_Widget, Text_Widget
+	Vector,
+	Vector3,
+	vec,
+	vec3,
+	vec4,
+	color,
+	Matrix,
+	Mat4,
+	Light,
+	Shape,
+	Material,
+	Shader,
+	Texture,
+	Scene,
+	Canvas_Widget,
+	Code_Widget,
+	Text_Widget,
 } = tiny;
 
 // Now we have loaded everything in the files tiny-graphics.js, tiny-graphics-widgets.js, and common.js.
@@ -18,8 +33,7 @@ const {
 
 const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo;
 
-Object.assign(defs,
-            {Transforms_Sandbox}, {Assignment2});
+Object.assign(defs, { Transforms_Sandbox }, { Assignment2 });
 
 // ******************** End extra step
 
@@ -28,4 +42,11 @@ Object.assign(defs,
 const Main_Scene = Assignment2;
 const Additional_Scenes = [];
 
-export {Main_Scene, Additional_Scenes, Canvas_Widget, Code_Widget, Text_Widget, defs}
+export {
+	Main_Scene,
+	Additional_Scenes,
+	Canvas_Widget,
+	Code_Widget,
+	Text_Widget,
+	defs,
+};
