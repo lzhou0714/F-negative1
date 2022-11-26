@@ -1,5 +1,6 @@
 import {defs, tiny} from './examples/common.js';
 import {Shape_From_File} from './examples/obj-file-demo.js';
+import { Text_Line } from './examples/text-demo.js';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Matrix, Mat4, Light,Texture, Shape, Material, Scene,
@@ -51,6 +52,8 @@ class Base_Scene extends Scene {
             'curve': new Rounded_Edge(50,50),
             'axis': new defs.Axis_Arrows(),
             'kart': new Shape_From_File("assets/kart/kart.obj"),
+            'coin': new Shape_From_File("assets/collectibles/coin.obj"),
+            'text': new Text_Line(1),
 
         };
 
@@ -81,6 +84,16 @@ class Base_Scene extends Scene {
                 ambient: 1, diffusivity: 0, specularity: 0, 
                 texture: new Texture("assets/kart/kart_r.png")
             }),
+
+            coin: new Material(new defs.Phong_Shader(), {
+                color:hex_color("F7FF00"),
+                ambient: 0.7, diffusivity: 0.5, specularity: 1,
+            }),
+            text: new Material(new defs.Phong_Shader(1), {
+                ambient: 1, diffusivity: 0, specularity: 0,
+                texture: new Texture("assets/text.png")
+            }),
+        
         };
         // The white material and basic shader are used for drawing the outline.
         this.white = new Material(new defs.Basic_Shader());
@@ -138,7 +151,10 @@ export class Assignment2 extends Base_Scene {
 		this.velz = 0;
 
         // Colliders
-
+        this.num_coins = 5;
+        this.rad = 1.25
+        this.coin_collected = new Array(this.num_coins).fill(false);
+        this.score = 0;
 
         // Key presses
         this.keyListeners = {}
@@ -297,10 +313,41 @@ export class Assignment2 extends Base_Scene {
         
         return model_transform.times(Mat4.scale(1, 1/1.5, 1));  // Unscale before return
     }
+    draw_coins(context, program_state, model_transform) {
+        this.shapes.coin.draw(
+            context,
+            program_state,
+            model_transform,
+            this.materials.coin
+        );
+    }
 
     detect_collision(deltax, deltay) {
         
     }
+    sphere_collider(radius, x, y){
+        let dist = Math.sqrt(Math.pow(x-this.x, 2)  + Math.pow(y- this.y, 2));
+        console.log(dist);
+        if (dist < (radius+this.rad)){
+            return true;
+        }
+        return false;
+    }
+
+    collect_coin(radius,x,y, index){
+        if (this.sphere_collider(radius,x,y)){
+            this.score += 1;
+            this.coin_collected[index] = true;
+        }
+    }
+
+    // draw_text (context, program_state, model_transform) {
+    //     model_transform = model_transform.times(Mat4.rotation(Math.PI/2, 1, 0, 0))
+
+    //     let text = 'Score: ' + this.score;
+    //     this.shapes.text.set_string(text, context.context);
+    //     this.shapes.text.draw(context, program_state, model_transform, this.materials.text);
+    // }
 
 	draw_car(context, program_state, model_transform) {
 		// model_transform = model_transform.times(Mat4.translation(this.x, this.y, this.z));
@@ -322,7 +369,7 @@ export class Assignment2 extends Base_Scene {
 		
 		model_transform = Mat4.identity();
         // model_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0))
-        model_transform = model_transform.times(Mat4.translation(0, 0, -0.6))
+        model_transform = model_transform.times(Mat4.translation(0, 0, -0.45))
 		model_transform = model_transform.times(Mat4.translation(this.x, this.y, this.z));
 		model_transform = model_transform.times(Mat4.rotation(lerp_rotx, 0, 0, 1));
 		
@@ -355,7 +402,7 @@ export class Assignment2 extends Base_Scene {
 		
 
         ///////////COMMENTED OUT TO SEE TRACK////////////////
-        // program_state.set_camera(init_pos);
+        program_state.set_camera(init_pos);
 		
 		this.lastrotx = lerp_rotx;
 		// program_state.set_camera(model_transform.times(Mat4.translation(0, 5, -10)).times(Mat4.look_at(vec3(0, 5, 20), vec3(0, 0, 0), vec3(0, 1, 0))));
@@ -398,6 +445,8 @@ export class Assignment2 extends Base_Scene {
     display(context, program_state) {
         super.display(context, program_state);
         const blue = hex_color("#1a9ffa");
+        let t, dt;
+            t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
         let model_transform = Mat4.identity();
 
         //for reference
@@ -408,6 +457,20 @@ export class Assignment2 extends Base_Scene {
         
 		this.draw_car(context, program_state, model_transform);
 		
+        //radius of coin = 1.3
+        let cy = 20, cx = 0;
+        let coin_init = model_transform.times(Mat4.translation(cx, cy, 1.35));
+        let coin_pos = new Array(this.num_coins).fill(coin_init);
+        for (let i = 0; i < this.num_coins; i++){
+            coin_pos[i] = coin_pos[i].times(Mat4.translation(0, 5*i, 0));
+            cy+=i*5;
+            coin_pos[i] = coin_pos[i].times(Mat4.rotation(t, 0, 0, 1));
+            this.collect_coin(1.3, cx,cy,i );
+            if (!this.coin_collected[i]){
+                this.draw_coins(context, program_state, coin_pos[i]);
+            }
+        }
         
+        // this.draw_text(context, program_state, model_transform);
     }
 }
