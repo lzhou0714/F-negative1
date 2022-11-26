@@ -376,6 +376,7 @@ export class GameMap extends Base_Scene {
 
 		return model_transform.times(Mat4.scale(1, 1 / 1.5, 1)); // Unscale before return
 	}
+
 	draw_coins(context, program_state, model_transform) {
 		this.shapes.coin.draw(
 			context,
@@ -573,24 +574,24 @@ export class GameMap extends Base_Scene {
 		this.draw_environment(context, program_state, model_transform);
 		//player
 
+		this.draw_car(context, program_state, model_transform);
 		//radius of coin = 1.3
 		let cy = 20,
 			cx = 0;
 		let coin_init = model_transform.times(
 			Mat4.translation(cx, cy, 1.35)
 		);
-		let coin_pos = new Array(this.num_coins).fill(coin_init);
+
 		for (let i = 0; i < this.num_coins; i++) {
-			coin_pos[i] = coin_pos[i].times(Mat4.translation(0, 5 * i, 0));
-			cy += i * 5;
-			coin_pos[i] = coin_pos[i].times(Mat4.rotation(t, 0, 0, 1));
-			this.collect_coin(1.3, cx, cy, i);
+			let coin_pos = coin_init
+				.times(Mat4.translation(0, 5 * i, 0))
+				.times(Mat4.rotation(t, 0, 0, 1));
+
+			this.collect_coin(1.3, cx, cy + i * 5, i);
 			if (!this.coin_collected[i]) {
-				this.draw_coins(context, program_state, coin_pos[i]);
+				this.draw_coins(context, program_state, coin_pos);
 			}
 		}
-
-		this.draw_car(context, program_state, model_transform);
 
 		// this.draw_text(context, program_state, model_transform);
 	}
