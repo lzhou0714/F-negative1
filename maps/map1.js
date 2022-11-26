@@ -1,6 +1,8 @@
 import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Shape_From_File } from '../tiny-graphics-stuff/obj-file-demo.js';
 import { Text_Line } from '../tiny-graphics-stuff/text-demo.js';
+import { Curve_Collider } from '../colliders/CurveCollider.js';
+import { Box_Collider } from '../colliders/BoxCollider.js';
 
 const {
 	Vector,
@@ -20,19 +22,6 @@ const {
 } = tiny;
 
 const { Textured_Phong } = defs;
-
-class Collider {}
-
-// Rectangular colliders
-class Box_Collider extends Collider {
-	constructor(x, y, width, length) {}
-}
-
-// 90 degree curve colliders
-class Curve_Collider extends Collider {
-	// Note - cartesian quadrants: 1 = top right, 2 = top left, 3 = bot left, 4 = bot right
-	constructor(x, y, radius, quadrant) {}
-}
 
 class Rounded_Edge extends Shape {
 	// Build a donut shape.  An example of a surface of revolution.
@@ -186,6 +175,9 @@ export class GameMap extends Base_Scene {
 		this.velz = 0;
 
 		// Colliders
+		this.colliders = new Array();
+
+		// Coins
 		this.num_coins = 5;
 		this.rad = 1.25;
 		this.coin_collected = new Array(this.num_coins).fill(false);
@@ -391,7 +383,7 @@ export class GameMap extends Base_Scene {
 		let dist = Math.sqrt(
 			Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2)
 		);
-		console.log(dist);
+
 		if (dist < radius + this.rad) {
 			return true;
 		}
@@ -413,6 +405,24 @@ export class GameMap extends Base_Scene {
 	//     this.shapes.text.draw(context, program_state, model_transform, this.materials.text);
 	// }
 
+	move_with_collision(deltax, deltay) {
+		let newx = this.x + deltax;
+		let newy = this.y + deltay;
+		let len = this.colliders.length;
+		for (let i = 0; i < len; i++) {
+			// console.log(this.colliders[i]);
+			let res = this.colliders[i].check_collision(newx, newy);
+
+			if (res.resx != newx || res.resy != newy) {
+				this.x = res.resx;
+				this.y = res.resy;
+				return;
+			}
+		}
+		this.x = newx;
+		this.y = newy;
+	}
+
 	draw_car(context, program_state, model_transform) {
 		// model_transform = model_transform.times(Mat4.translation(this.x, this.y, this.z));
 		this.vely = Math.max(Math.min(this.vely, 0.06), -0.01);
@@ -433,15 +443,12 @@ export class GameMap extends Base_Scene {
 			Math.cos(lerp_rotx);
 
 		// Actual movement happens - Collision detection will occur here
-		this.x += deltax;
-		this.y += deltay;
+		//this.x += deltax;
+		//this.y += deltay;
+		this.move_with_collision(deltax, deltay);
 		// this.z += this.velz * program_state.animation_delta_time
 
 		model_transform = Mat4.identity();
-		// model_transform = model_transform.times(Mat4.rotation(Math.PI/2,1,0,0))
-		model_transform = model_transform.times(
-			Mat4.translation(0, 0, -0.45)
-		);
 		model_transform = model_transform.times(
 			Mat4.translation(this.x, this.y, this.z)
 		);
@@ -511,7 +518,7 @@ export class GameMap extends Base_Scene {
 			this.materials.flat.override(hex_color('87CEEB'))
 		);
 
-		//curve back
+		//curve front
 		let curve1_transform = model_transform
 			.times(Mat4.rotation(0, 0, 0, 1))
 			.times(Mat4.rotation(Math.PI, 0, 1, 0))
@@ -523,6 +530,39 @@ export class GameMap extends Base_Scene {
 			curve1_transform,
 			this.materials.road
 		);
+
+		let curve1l_collider = new Curve_Collider(30, -100, 41, 2, 3);
+		let curve1r_collider = new Curve_Collider(30, -100, 41, 2, 4);
+		this.colliders[0] = curve1l_collider;
+		this.colliders[1] = curve1r_collider;
+
+		let curve2l_collider = new Curve_Collider(30, -100, 19, 2, 3);
+		let curve2r_collider = new Curve_Collider(30, -100, 19, 2, 4);
+		this.colliders[2] = curve2l_collider;
+		this.colliders[3] = curve2r_collider;
+
+		//curve back
+		let curve2_transform = model_transform
+			.times(Mat4.rotation(Math.PI, 0, 0, 1))
+			.times(Mat4.rotation(Math.PI, 0, 1, 0))
+			.times(Mat4.translation(30, -100, 0))
+			.times(Mat4.scale(20, 20, 10));
+		this.shapes.curve.draw(
+			context,
+			program_state,
+			curve2_transform,
+			this.materials.road
+		);
+
+		let curve3l_collider = new Curve_Collider(30, 100, 41, 2, 2);
+		let curve3r_collider = new Curve_Collider(30, 100, 41, 2, 1);
+		this.colliders[4] = curve3l_collider;
+		this.colliders[5] = curve3r_collider;
+
+		let curve4l_collider = new Curve_Collider(30, 100, 19, 2, 2);
+		let curve4r_collider = new Curve_Collider(30, 100, 19, 2, 1);
+		this.colliders[6] = curve4l_collider;
+		this.colliders[7] = curve4r_collider;
 
 		//left side straight track
 		let plane_transform = model_transform.times(
@@ -537,19 +577,10 @@ export class GameMap extends Base_Scene {
 			straight1_transform,
 			this.materials.road
 		);
-
-		//curve front
-		let curve2_transform = model_transform
-			.times(Mat4.rotation(Math.PI, 0, 0, 1))
-			.times(Mat4.rotation(Math.PI, 0, 1, 0))
-			.times(Mat4.translation(30, -100, 0))
-			.times(Mat4.scale(20, 20, 10));
-		this.shapes.curve.draw(
-			context,
-			program_state,
-			curve2_transform,
-			this.materials.road
-		);
+		let track1l_collider = new Box_Collider(-11, -101, 2, 202);
+		let track1r_collider = new Box_Collider(9, -101, 2, 202);
+		this.colliders[8] = track1l_collider;
+		this.colliders[9] = track1r_collider;
 
 		//left side straight track
 		let straight2_transform = plane_transform.times(
@@ -561,11 +592,14 @@ export class GameMap extends Base_Scene {
 			straight2_transform,
 			this.materials.road
 		);
+		let track2l_collider = new Box_Collider(49, -101, 2, 202);
+		let track2r_collider = new Box_Collider(69, -101, 2, 202);
+		this.colliders[10] = track2l_collider;
+		this.colliders[11] = track2r_collider;
 	}
 
 	display(context, program_state) {
 		super.display(context, program_state);
-		const blue = hex_color('#1a9ffa');
 		let t, dt;
 		(t = program_state.animation_time / 1000),
 			(dt = program_state.animation_delta_time / 1000);
@@ -592,7 +626,5 @@ export class GameMap extends Base_Scene {
 				this.draw_coins(context, program_state, coin_pos);
 			}
 		}
-
-		// this.draw_text(context, program_state, model_transform);
 	}
 }

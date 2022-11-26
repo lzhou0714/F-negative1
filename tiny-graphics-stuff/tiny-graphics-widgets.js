@@ -306,7 +306,7 @@ const Code_Widget = (widgets.Code_Widget = class Code_Widget {
 
 		if (!main_scene) return;
 
-		import('./main-scene.js').then((module) => {
+		import('../maps/main-scene.js').then((module) => {
 			this.build_reader(
 				element,
 				main_scene,
