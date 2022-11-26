@@ -147,6 +147,20 @@ export class Assignment2 extends Base_Scene {
 
 		// Key presses
 		this.keyListeners = {};
+
+		window.setInterval(() => {
+			if (!this.keyListeners['w'] && this.vely > 0) {
+				this.vely -= 0.005;
+				if (this.vely < 0) {
+					this.vely = 0;
+				}
+			} else if (!this.keyListeners['d'] && this.vely < 0) {
+				this.vely += 0.005;
+				if (this.vely > 0) {
+					this.vely = 0;
+				}
+			}
+		}, 500);
 	}
 
 	set_colors() {
@@ -200,19 +214,6 @@ export class Assignment2 extends Base_Scene {
 			125
 		);
 
-		window.setInterval(() => {
-			if (!this.keyListeners['w'] && this.vely > 0) {
-				this.vely -= 0.005;
-				if (this.vely < 0) {
-					this.vely = 0;
-				}
-			} else if (!this.keyListeners['d'] && this.vely < 0) {
-				this.vely += 0.005;
-				if (this.vely > 0) {
-					this.vely = 0;
-				}
-			}
-		}, 500);
 		this.addHoldKey('s', () => (this.vely -= 0.002), 'Brake', 125);
 		this.addHoldKey(
 			'd',
@@ -295,6 +296,7 @@ export class Assignment2 extends Base_Scene {
 			.times(Mat4.rotation(angle, 45, 0, 1))
 			.times(Mat4.translation(1, 1.5, 0))
 			.times(Mat4.scale(1, 1.5, 1)); // Scale the size (Req 7)
+
 		if (!this.outline) {
 			if (index % 2 != 0) {
 				this.shapes.triangle.draw(
@@ -518,7 +520,6 @@ export class Assignment2 extends Base_Scene {
 		super.display(context, program_state);
 		const blue = hex_color('#1a9ffa');
 		let model_transform = Mat4.identity();
-		w;
 		this.draw_environment(context, program_state, model_transform);
 		//player
 
