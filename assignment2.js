@@ -36,26 +36,26 @@ class Rounded_Edge extends Shape {
 }
 
 class Particle {
-    constructor(vx, vy, vz) {
-        this.vx = vx;
-        this.vy = vy;
-        this.vz = vz;
-        this.x = 0;
-        this.y = 0;
-        this.z = 0;
-        this.age = 0;
-    }
+	constructor(vx, vy, vz) {
+		this.vx = vx;
+		this.vy = vy;
+		this.vz = vz;
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
+		this.age = 0;
+	}
 
-    move(anim_time) {
-        this.x += this.vx * anim_time;
-        this.y += this.vy * anim_time;
-        this.z += this.vz * anim_time;
-        this.age += anim_time;
-    }
+	move(anim_time) {
+		this.x += this.vx * anim_time;
+		this.y += this.vy * anim_time;
+		this.z += this.vz * anim_time;
+		this.age += anim_time;
+	}
 
-    get_info() {
-        return {x: this.x, y: this.y, z: this.z, age: this.age}
-    }
+	get_info() {
+		return { x: this.x, y: this.y, z: this.z, age: this.age };
+	}
 }
 
 class Base_Scene extends Scene {
@@ -539,9 +539,7 @@ export class Assignment2 extends Base_Scene {
 		this.colliders[11] = track2r_collider;
 	}
 
-    spawn_particles() {
-        
-    }
+	spawn_particles() {}
 
 	display(context, program_state) {
 		super.display(context, program_state);
