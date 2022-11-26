@@ -545,7 +545,6 @@ export class Assignment2 extends Base_Scene {
 		super.display(context, program_state);
 		const blue = hex_color('#1a9ffa');
 		let model_transform = Mat4.identity();
-		w;
 		this.draw_environment(context, program_state, model_transform);
 		//player
 
