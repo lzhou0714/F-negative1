@@ -428,7 +428,7 @@ export class GameMap extends Base_Scene {
 		this.vely = Math.max(Math.min(this.vely, 0.06), -0.01);
 
 		// Linear Interpolation (for smoothing)
-		let lerp_factor = 0.1;
+		let lerp_factor = 0.03;
 		let lerp_rotx =
 			this.lastrotx * (1 - lerp_factor) + this.rotx * lerp_factor;
 
