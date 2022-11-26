@@ -13,10 +13,16 @@
 	<body>
 			<ul class="maps-menu">
         <h1>F-NegativeOne</h1>
-				<li><button onclick="location.href = './map1.html';">Easy</button></li>
-        <li><button onclick="location.href = './map1.html';">Medium</button></li>
-        <li><button onclick="location.href = './map1.html';">Hard</button></li>
+				<li><button onclick="goToMap(1);">Easy</button></li>
+        <li><button onclick="goToMap(2);">Medium</button></li>
+        <li><button onclick="goToMap(3);">Hard</button></li>
 			</ul>
 		</div>
+		<script type="text/javascript">
+			function goToMap(mapNumber)
+			{
+				window.location = '/map.html?map_number=' + mapNumber;
+			}
+		</script>
 	</body>
 </html>
