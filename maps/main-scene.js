@@ -1,6 +1,6 @@
-import { defs, tiny } from './tiny-graphics-stuff/common.js';
+import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 
-import { Transforms_Sandbox } from './tiny-graphics-stuff/transforms-sandbox.js';
+import { Transforms_Sandbox } from '../tiny-graphics-stuff/transforms-sandbox.js';
 
 // Pull these names into this module's scope for convenience:
 const {
@@ -35,7 +35,7 @@ const map_number = urlParams.get('map_number')
 	? urlParams.get('map_number')
 	: 1;
 
-const { GameMap } = await import('./maps/map' + map_number + '.js');
+const { GameMap } = await import('./map' + map_number + '.js');
 
 const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo;
 

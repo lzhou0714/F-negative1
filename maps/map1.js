@@ -570,18 +570,8 @@ export class GameMap extends Base_Scene {
 			(dt = program_state.animation_delta_time / 1000);
 		let model_transform = Mat4.identity();
 
-		//for reference
-		this.shapes.axis.draw(
-			context,
-			program_state,
-			model_transform,
-			this.materials.plastic
-		);
-
 		this.draw_environment(context, program_state, model_transform);
 		//player
-
-		this.draw_car(context, program_state, model_transform);
 
 		//radius of coin = 1.3
 		let cy = 20,
@@ -599,6 +589,8 @@ export class GameMap extends Base_Scene {
 				this.draw_coins(context, program_state, coin_pos[i]);
 			}
 		}
+
+		this.draw_car(context, program_state, model_transform);
 
 		// this.draw_text(context, program_state, model_transform);
 	}
