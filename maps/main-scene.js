@@ -23,6 +23,8 @@ const {
 	Text_Widget,
 } = tiny;
 
+const { Textured_Phong } = defs;
+
 // Now we have loaded everything in the files tiny-graphics.js, tiny-graphics-widgets.js, and common.js.
 // This yielded "tiny", an object wrapping the stuff in the first two files, and "defs" for wrapping all the rest.
 

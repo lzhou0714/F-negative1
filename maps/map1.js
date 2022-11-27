@@ -1,8 +1,7 @@
 import { defs, tiny } from '../tiny-graphics-stuff/common.js';
-import { Shape_From_File } from '../tiny-graphics-stuff/obj-file-demo.js';
-import { Text_Line } from '../tiny-graphics-stuff/text-demo.js';
 import { Curve_Collider } from '../colliders/CurveCollider.js';
 import { Box_Collider } from '../colliders/BoxCollider.js';
+import { Base_Scene } from './base-scene.js';
 
 const {
 	Vector,
@@ -20,129 +19,6 @@ const {
 	Material,
 	Scene,
 } = tiny;
-
-const { Textured_Phong } = defs;
-
-class Rounded_Edge extends Shape {
-	// Build a donut shape.  An example of a surface of revolution.
-	constructor(rows, columns, texture_range) {
-		super('position', 'normal', 'texture_coord');
-		const points_arr = Vector3.cast([-2, 0, 0], [-1, 0, 0]);
-		defs.Half_Surface_Of_Revolution.insert_transformed_copy_into(
-			this,
-			[rows, columns, points_arr, texture_range]
-		);
-	}
-}
-
-class Base_Scene extends Scene {
-	/**
-	 *  **Base_scene** is a Scene that can be added to any display canvas.
-	 *  Setup the shapes, materials, camera, and lighting here.
-	 */
-	constructor() {
-		// constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
-		super();
-		this.hover = this.swarm = false;
-		// At the beginning of our program, load one of each of these shape definitions onto the GPU.
-		this.shapes = {
-			cube: new defs.Cube(),
-			sphere: new defs.Subdivision_Sphere(4),
-			plane: new defs.Square(),
-			curve: new Rounded_Edge(50, 50),
-			axis: new defs.Axis_Arrows(),
-			kart: new Shape_From_File('../assets/kart/kart.obj'),
-			coin: new Shape_From_File('../assets/collectibles/coin.obj'),
-			text: new Text_Line(1),
-		};
-
-		// *** Materials
-		this.materials = {
-			plastic: new Material(new defs.Phong_Shader(), {
-				ambient: 0.4,
-				diffusivity: 0.6,
-				color: hex_color('#ffffff'),
-			}),
-			flat: new Material(new defs.Phong_Shader(), {
-				ambient: 1,
-				diffusivity: 0,
-				specularity: 0,
-				color: hex_color('#ffffff'),
-			}),
-
-			road: new Material(new Textured_Phong(), {
-				color: hex_color('#ffffff'),
-				ambient: 0.5,
-				diffusivity: 0.1,
-				specularity: 0.1,
-				texture: new Texture('assets/road.jpg'),
-			}),
-			kart: new Material(new Textured_Phong(), {
-				color: hex_color('#000000'),
-				ambient: 1,
-				diffusivity: 0.2,
-				specularity: 1,
-				texture: new Texture('assets/kart/kart_b_bc.png'),
-			}),
-			kartM: new Material(new Textured_Phong(), {
-				color: hex_color('#000000'),
-				ambient: 0.1,
-				diffusivity: 0.2,
-				specularity: 1,
-				texture: new Texture('assets/kart/kart_m.png'),
-			}),
-			kartR: new Material(new Textured_Phong(), {
-				color: hex_color('#000000'),
-				ambient: 1,
-				diffusivity: 0,
-				specularity: 0,
-				texture: new Texture('assets/kart/kart_r.png'),
-			}),
-
-			coin: new Material(new defs.Phong_Shader(), {
-				color: hex_color('F7FF00'),
-				ambient: 0.7,
-				diffusivity: 0.5,
-				specularity: 1,
-			}),
-			text: new Material(new defs.Phong_Shader(1), {
-				ambient: 1,
-				diffusivity: 0,
-				specularity: 0,
-				texture: new Texture('assets/text.png'),
-			}),
-		};
-		// The white material and basic shader are used for drawing the outline.
-		this.white = new Material(new defs.Basic_Shader());
-		this.colors = [];
-	}
-
-	display(context, program_state) {
-		// display():  Called once per frame of animation. Here, the base class's display only does
-		// some initial setup.
-
-		// Setup -- This part sets up the scene's overall camera matrix, projection matrix, and lights:
-		if (!context.scratchpad.controls) {
-			this.children.push(
-				(context.scratchpad.controls = new defs.Movement_Controls())
-			);
-			// Define the global camera and projection matrices, which are stored in program_state.
-			program_state.set_camera(Mat4.translation(5, -10, -30));
-		}
-		program_state.projection_transform = Mat4.perspective(
-			Math.PI / 4,
-			context.width / context.height,
-			1,
-			700
-		);
-
-		// *** Lights: *** Values of vector or point lights.
-		const light_position = vec4(0, 50, 50, 1);
-		program_state.lights = [
-			new Light(light_position, color(1, 1, 1, 1), 10 ** 10),
-		];
-	}
-}
 
 export class GameMap extends Base_Scene {
 	/**
@@ -186,6 +62,10 @@ export class GameMap extends Base_Scene {
 		// Key presses
 		this.keyListeners = {};
 
+		// Transformation matrix for building roads
+		this.model_transform = Mat4.identity();
+		// This sets up traction for the car
+		// If w or d is pressed ignore traction
 		window.setInterval(() => {
 			if (!this.keyListeners['w'] && this.vely > 0) {
 				this.vely -= 0.005;
@@ -229,22 +109,6 @@ export class GameMap extends Base_Scene {
 	}
 
 	make_control_panel() {
-		// Draw the scene's buttons, setup their actions and keyboard shortcuts, and monitor live measurements.
-		this.key_triggered_button(
-			'Change Colors',
-			['c'],
-			this.set_colors
-		);
-		// Add a button for controlling the scene.
-		this.key_triggered_button('Outline', ['o'], () => {
-			// TODO:  Requirement 5b:  Set a flag here that will toggle your outline on and off
-			this.outline = !this.outline;
-		});
-		this.key_triggered_button('Sit still', ['m'], () => {
-			// TODO:  Requirement 3d:  Set a flag here that will toggle your swaying motion on and off.
-			this.sway = !this.sway;
-		});
-
 		this.addHoldKey(
 			'w',
 			() => (this.vely += 0.002),
@@ -317,54 +181,23 @@ export class GameMap extends Base_Scene {
 	}
 
 	draw_box(context, program_state, model_transform, index) {
-		let angle = 0;
-
-		if (this.sway) {
-			angle =
-				((0.05 * Math.PI * index) / 7) *
-				(1 +
-					Math.cos(
-						(program_state.animation_time * Math.PI * 2) / 3000
-					));
-		} else {
-			angle = ((0.05 * Math.PI * index) / 7) * 2;
-		}
+		const angle = ((0.05 * Math.PI * index) / 7) * 2;
 
 		model_transform = model_transform
 			.times(Mat4.translation(-1, 1.5, 0))
 			.times(Mat4.rotation(angle, 45, 0, 1))
 			.times(Mat4.translation(1, 1.5, 0))
 			.times(Mat4.scale(1, 1.5, 1)); // Scale the size (Req 7)
-		if (!this.outline) {
-			if (index % 2 != 0) {
-				this.shapes.triangle.draw(
-					context,
-					program_state,
-					model_transform,
-					this.materials.plastic.override({
-						color: this.colors[index],
-					}),
-					'TRIANGLE_STRIP'
-				);
-			} else {
-				this.shapes.cube.draw(
-					context,
-					program_state,
-					model_transform,
-					this.materials.plastic.override({
-						color: this.colors[index],
-					})
-				);
-			}
-		} else {
-			this.shapes.outline.draw(
-				context,
-				program_state,
-				model_transform,
-				this.white,
-				'LINES'
-			);
-		}
+
+		this.shapes.triangle.draw(
+			context,
+			program_state,
+			model_transform,
+			this.materials.plastic.override({
+				color: this.colors[index],
+			}),
+			'TRIANGLE_STRIP'
+		);
 
 		return model_transform.times(Mat4.scale(1, 1 / 1.5, 1)); // Unscale before return
 	}
@@ -378,7 +211,6 @@ export class GameMap extends Base_Scene {
 		);
 	}
 
-	detect_collision(deltax, deltay) {}
 	sphere_collider(radius, x, y) {
 		let dist = Math.sqrt(
 			Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2)
@@ -495,18 +327,9 @@ export class GameMap extends Base_Scene {
 		// program_state.set_camera(model_transform.times(Mat4.translation(0, 5, -10)).times(Mat4.look_at(vec3(0, 5, 20), vec3(0, 0, 0), vec3(0, 1, 0))));
 	}
 
-	draw_environment(context, program_state, model_transform) {
-		//light
-		let light_mat = model_transform.times(
-			Mat4.translation(50, 50, 50)
-		);
-		this.shapes.sphere.draw(
-			context,
-			program_state,
-			light_mat,
-			this.materials.flat
-		);
+	draw_road(context, program_state, model_transform) {}
 
+	draw_environment(context, program_state, model_transform) {
 		//surroundings
 		let sphereTransform = model_transform.times(
 			Mat4.scale(500, 500, 500)
