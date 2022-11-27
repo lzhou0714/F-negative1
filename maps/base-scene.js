@@ -33,6 +33,18 @@ class Rounded_Edge extends Shape {
 	}
 }
 
+class Rounded_Edge_Quarter extends Shape {
+	// Build a donut shape.  An example of a surface of revolution.
+	constructor(rows, columns, texture_range) {
+		super('position', 'normal', 'texture_coord');
+		const points_arr = Vector3.cast([-2, 0, 0], [-1, 0, 0]);
+		defs.Quarter_Surface_Of_Revolution.insert_transformed_copy_into(
+			this,
+			[rows, columns, points_arr, texture_range]
+		);
+	}
+}
+
 export class Base_Scene extends Scene {
 	/**
 	 *  **Base_scene** is a Scene that can be added to any display canvas.
@@ -48,6 +60,7 @@ export class Base_Scene extends Scene {
 			sphere: new defs.Subdivision_Sphere(4),
 			plane: new defs.Square(),
 			curve: new Rounded_Edge(50, 50),
+			quarter_curve: new Rounded_Edge_Quarter(50, 50),
 			axis: new defs.Axis_Arrows(),
 			kart: new Shape_From_File('../assets/kart/kart.obj'),
 			coin: new Shape_From_File('../assets/collectibles/coin.obj'),

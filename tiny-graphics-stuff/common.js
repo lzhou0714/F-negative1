@@ -546,6 +546,38 @@ const Half_Surface_Of_Revolution =
 		}
 	});
 
+const Quarter_Surface_Of_Revolution =
+	(defs.Quarter_Surface_Of_Revolution = class Surface_Of_Revolution extends (
+		Grid_Patch
+	) {
+		// SURFACE OF REVOLUTION: Produce a curved "sheet" of triangles with rows and columns.
+		// Begin with an input array of points, defining a 1D path curving through 3D space --
+		// now let each such point be a row.  Sweep that whole curve around the Z axis in equal
+		// steps, stopping and storing new points along the way; let each step be a column. Now
+		// we have a flexible "generalized cylinder" spanning an area until total_curvature_angle.
+		constructor(
+			rows,
+			columns,
+			points,
+			texture_coord_range,
+			total_curvature_angle = Math.PI / 2
+		) {
+			const row_operation = (i) => Grid_Patch.sample_array(points, i),
+				column_operation = (j, p) =>
+					Mat4.rotation(total_curvature_angle / columns, 0, 0, 1)
+						.times(p.to4(1))
+						.to3();
+
+			super(
+				rows,
+				columns,
+				row_operation,
+				column_operation,
+				texture_coord_range
+			);
+		}
+	});
+
 const Regular_2D_Polygon =
 	(defs.Regular_2D_Polygon = class Regular_2D_Polygon extends (
 		Surface_Of_Revolution
