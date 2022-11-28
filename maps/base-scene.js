@@ -1,7 +1,7 @@
 import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Shape_From_File } from '../tiny-graphics-stuff/obj-file-demo.js';
 import { Text_Line } from '../tiny-graphics-stuff/text-demo.js';
-import { Texture_Road, Texture_Curve } from '../tiny-graphics-stuff/custom-textures.js';
+import { Texture_Road, Texture_Curve,Texture_Curve_Wall } from '../tiny-graphics-stuff/custom-textures.js';
 
 
 const {
@@ -35,6 +35,7 @@ class Rounded_Edge extends Shape {
 	}
 }
 
+
 class Rounded_Edge_Quarter extends Shape {
 	// Build a donut shape.  An example of a surface of revolution.
 	constructor(rows, columns, texture_range) {
@@ -46,6 +47,44 @@ class Rounded_Edge_Quarter extends Shape {
 		);
 	}
 }
+
+class Rounded_Outer_Wall_Quarter extends Shape{
+	// Build a donut shape.  An example of a surface of revolution.
+	constructor(rows, columns, texture_range) {
+		super('position', 'normal', 'texture_coord');
+		let inner = -1.905;
+		let height = 2;
+		const points_arr = Vector3.cast(
+			[-2,0,0], [-2,0,height+0.05], //left edge
+			[inner,0,0],[-2,0,0], //bottom edge
+			[inner,0,-0.1], [inner,0,height], //right edge 
+			[inner,0,height],[-2,0,height] //top edgee
+		)
+		defs.Quarter_Surface_Of_Revolution.insert_transformed_copy_into(
+			this,
+			[rows, columns, points_arr, texture_range]
+		);
+	}
+};
+
+class Rounded_Inner_Wall_Quarter extends Shape{
+	// Build a donut shape.  An example of a surface of revolution.
+	constructor(rows, columns, texture_range) {
+		super('position', 'normal', 'texture_coord');
+		let inner = -1.8;
+		let height = 2;
+		const points_arr = Vector3.cast(
+			[-2,0,height+0.05],[-2,0,0], //left edge
+			[inner,0,0],[-2,0,0], //bottom edge
+			[inner,0,0],[inner,0,height], //right edge 
+			[inner,0,height],[-2,0,height] //top edgee
+		)
+		defs.Quarter_Surface_Of_Revolution.insert_transformed_copy_into(
+			this,
+			[rows, columns, points_arr, texture_range]
+		);
+	}
+};
 
 export class Base_Scene extends Scene {
 	/**
@@ -59,6 +98,8 @@ export class Base_Scene extends Scene {
 		// At the beginning of our program, load one of each of these shape definitions onto the GPU.
 		this.shapes = {
 			wall: new defs.Cube(),
+			outer_curved_wall: new Rounded_Outer_Wall_Quarter(50, 50),
+			inner_curved_wall: new Rounded_Inner_Wall_Quarter(50, 50),
 			sphere: new defs.Subdivision_Sphere(4),
 			plane: new defs.Square(),
 			curve: new Rounded_Edge(50, 50),
@@ -70,7 +111,7 @@ export class Base_Scene extends Scene {
 		};
 
 		this.shapes.plane.arrays.texture_coord = this.shapes.plane.arrays.texture_coord.map(x => x.times(4))
-
+		this.shapes.outer_curved_wall.arrays.texture_coord = this.shapes.outer_curved_wall.arrays.texture_coord.map(x => x.times(1/7))
 
 		// *** Materials
 		this.materials = {
@@ -134,11 +175,12 @@ export class Base_Scene extends Scene {
 				specularity: 0,
 				texture: new Texture('assets/text.png'),
 			}),
-			wall: new Material(new Textured_Phong(), {
+			wall: new Material(new defs.Phong_Shader(), {
+				color: hex_color('#962330'),
 				ambient: 1,
-				diffusivity: 0,
+				diffusivity: 0.5,
 				specularity: 0,
-				texture: new Texture('assets/wall.png'),
+				// texture: new Texture('assets/wall.png'),
 			}),
 			
 

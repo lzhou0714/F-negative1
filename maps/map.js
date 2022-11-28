@@ -346,6 +346,34 @@ export class BaseMap extends Base_Scene {
 			road,
 			this.materials.road
 		);
+		
+		let wally = -length+1;
+		let rightwall_transform = this.model_transform
+			.times(Mat4.translation(length+1, wally, 1));
+		let leftwall_transform = this.model_transform
+			.times(Mat4.translation(-length-1, wally, 1));
+		for (let i = 1; i <= 10; i++) {
+			//leftside
+			this.shapes.wall.draw(
+				context,
+				program_state,
+				leftwall_transform.times(Mat4.rotation(Math.PI/2, 1,0, 0)),
+				this.materials.wall
+			)
+			//right side
+			this.shapes.wall.draw(
+				context,
+				program_state,
+				rightwall_transform.times(Mat4.rotation(Math.PI/2, 1,0, 0)),
+				this.materials.wall
+			)
+			wally +=2;
+			rightwall_transform = this.model_transform
+			.times(Mat4.translation(length+1, wally, 1));
+			leftwall_transform = this.model_transform
+			.times(Mat4.translation(-length-1, wally, 1));
+		}
+
 
 		const x =
 			this.model_transform[0][this.model_transform.length - 1];
@@ -378,11 +406,13 @@ export class BaseMap extends Base_Scene {
 	}
 
 	draw_curve(context, program_state,direction) {
-		let xScale,xTrans,adjustAngle, adjustX;
+		let xScale,xTrans,adjustAngle, adjustX,xWallOuter, xWallInner;
 		
 		if (direction == 'r'){ //turn right config
 			xTrans = 30
 			xScale = 20;
+			xWallOuter = 21;
+			xWallInner = 10;
 			adjustAngle = -Math.PI/2;
 			adjustX = -30	
 			
@@ -390,6 +420,8 @@ export class BaseMap extends Base_Scene {
 		else {//turn leftw config
 			xTrans = -30;
 			xScale = -20;
+			xWallOuter = -21;
+			xWallInner = -10;
 			adjustAngle = Math.PI/2;
 			adjustX = 30;
 		}
@@ -403,6 +435,21 @@ export class BaseMap extends Base_Scene {
 				program_state,
 				this.model_transform.times(Mat4.scale(xScale, -20, 1)),
 				this.materials.curve
+			);
+			this.shapes.outer_curved_wall.draw(
+				context,
+				program_state,
+				this.model_transform
+					.times(Mat4.scale(xWallOuter, -21, 1)),
+				this.materials.wall
+			);
+		
+			this.shapes.inner_curved_wall.draw(
+				context,
+				program_state,
+				this.model_transform
+					.times(Mat4.scale(xWallInner, -10, 1)),
+				this.materials.wall
 			);
 
 			//adjust for next track
