@@ -31,6 +31,15 @@ export class GameMap extends BaseMap {
 
 	draw_environment(context, program_state, model_transform) {
 		//surroundings
+		let grass_transform = model_transform
+			.times(Mat4.translation(0, 0, -0.5))
+			.times(Mat4.scale(500, 500, 1));
+		this.shapes.plane.draw(
+			context,
+			program_state,
+			grass_transform,
+			this.materials.grass
+			);
 		let sphereTransform = model_transform.times(
 			Mat4.scale(500, 500, 500)
 		);
@@ -38,7 +47,7 @@ export class GameMap extends BaseMap {
 			context,
 			program_state,
 			sphereTransform,
-			this.materials.flat.override(hex_color('000000'))
+			this.materials.flat.override(hex_color('87ceeb'))
 		);
 
 		// // left side straight track

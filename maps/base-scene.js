@@ -1,7 +1,7 @@
 import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Shape_From_File } from '../tiny-graphics-stuff/obj-file-demo.js';
 import { Text_Line } from '../tiny-graphics-stuff/text-demo.js';
-import { Texture_Road, Texture_Curve,Texture_Curve_Wall } from '../tiny-graphics-stuff/custom-textures.js';
+import { Texture_Road, Texture_Curve,Texture_Curve_Wall, Texture_grass } from '../tiny-graphics-stuff/custom-textures.js';
 
 
 const {
@@ -111,7 +111,7 @@ export class Base_Scene extends Scene {
 		};
 
 		this.shapes.plane.arrays.texture_coord = this.shapes.plane.arrays.texture_coord.map(x => x.times(4))
-		this.shapes.outer_curved_wall.arrays.texture_coord = this.shapes.outer_curved_wall.arrays.texture_coord.map(x => x.times(1/7))
+		// this.shapes.outer_curved_wall.arrays.texture_coord = this.shapes.outer_curved_wall.arrays.texture_coord.map(x => x.times(1/7))
 
 		// *** Materials
 		this.materials = {
@@ -175,12 +175,26 @@ export class Base_Scene extends Scene {
 				specularity: 0,
 				texture: new Texture('assets/text.png'),
 			}),
-			wall: new Material(new defs.Phong_Shader(), {
-				color: hex_color('#962330'),
+			wall: new Material(new Textured_Phong(), {
+				color: hex_color('#000000'),
 				ambient: 1,
-				diffusivity: 0.5,
+				diffusivity: 0.25,
 				specularity: 0,
-				// texture: new Texture('assets/wall.png'),
+				texture: new Texture('assets/brick.png'),
+			}),
+			curved_wall: new Material(new Texture_Curve_Wall(), {
+				color: hex_color('#000000'),
+				ambient: 1,
+				diffusivity: 0.25,
+				specularity: 0,
+				texture: new Texture('assets/brick.png'),
+			}),
+			grass: new Material(new Texture_grass(), {
+				color: hex_color('#000000'),
+				ambient: 1,
+				diffusivity: 0.25,
+				specularity: 0,
+				texture: new Texture('assets/grass.png'),
 			}),
 			
 
