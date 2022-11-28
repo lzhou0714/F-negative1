@@ -45,6 +45,6 @@ export class Trigger_Collider extends Collider {
             callback();
         }
 
-		return { resx: resx, resy: resy };
+		// return { resx: resx, resy: resy };
 	}
 }
