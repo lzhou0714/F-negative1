@@ -35,8 +35,7 @@ const Canvas_Widget = (widgets.Canvas_Widget = class Canvas_Widget {
 			'.canvas-widget canvas { width: 1080px; height: 600px; margin-bottom:-3px }',
 		];
 
-		if (document.styleSheets.length == 0)
-			document.head.appendChild(document.createElement('style'));
+		document.head.appendChild(document.createElement('style'));
 		for (const r of rules)
 			document.styleSheets[
 				document.styleSheets.length - 1
