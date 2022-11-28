@@ -1,7 +1,8 @@
 import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Shape_From_File } from '../tiny-graphics-stuff/obj-file-demo.js';
 import { Text_Line } from '../tiny-graphics-stuff/text-demo.js';
-import { Texture_Road,Texture_Curve } from '../tiny-graphics-stuff/custom-textures.js';
+import { Texture_Road, Texture_Curve } from '../tiny-graphics-stuff/custom-textures.js';
+
 
 const {
 	Vector,
@@ -57,7 +58,7 @@ export class Base_Scene extends Scene {
 		this.hover = this.swarm = false;
 		// At the beginning of our program, load one of each of these shape definitions onto the GPU.
 		this.shapes = {
-			cube: new defs.Cube(),
+			wall: new defs.Cube(),
 			sphere: new defs.Subdivision_Sphere(4),
 			plane: new defs.Square(),
 			curve: new Rounded_Edge(50, 50),
@@ -67,6 +68,9 @@ export class Base_Scene extends Scene {
 			coin: new Shape_From_File('../assets/collectibles/coin.obj'),
 			text: new Text_Line(1),
 		};
+
+		this.shapes.plane.arrays.texture_coord = this.shapes.plane.arrays.texture_coord.map(x => x.times(4))
+
 
 		// *** Materials
 		this.materials = {
@@ -82,12 +86,19 @@ export class Base_Scene extends Scene {
 				color: hex_color('#ffffff'),
 			}),
 
-			road: new Material(new Textured_Phong(), {
+			road: new Material(new Texture_Road(), {
 				color: hex_color('#ffffff'),
 				ambient: 0.5,
-				diffusivity: 0.1,
-				specularity: 0.1,
-				texture: new Texture('assets/road.jpg'),
+				diffusivity: 0,
+				specularity: 0,
+				texture: new Texture('assets/road2.png', "LINEAR_MIPMAP_LINEAR"),
+			}),
+			curve: new Material(new Texture_Curve(), {
+				color: hex_color('#ffffff'),
+				ambient: 0.5,
+				diffusivity: 0,
+				specularity: 0,
+				texture: new Texture('assets/road2.png', "LINEAR_MIPMAP_LINEAR"),
 			}),
 			kart: new Material(new Textured_Phong(), {
 				color: hex_color('#000000'),
@@ -123,6 +134,14 @@ export class Base_Scene extends Scene {
 				specularity: 0,
 				texture: new Texture('assets/text.png'),
 			}),
+			wall: new Material(new Textured_Phong(), {
+				ambient: 1,
+				diffusivity: 0,
+				specularity: 0,
+				texture: new Texture('assets/wall.png'),
+			}),
+			
+
 		};
 
 		this.white = new Material(new defs.Basic_Shader());
