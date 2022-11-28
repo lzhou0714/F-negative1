@@ -394,7 +394,7 @@ export class GameMap extends Base_Scene {
 			context,
 			program_state,
 			curve1_transform,
-			this.materials.road
+			this.materials.curve
 		);
 
 		let curve1l_collider = new Curve_Collider(30, -100, 41, 2, 3);
@@ -432,7 +432,7 @@ export class GameMap extends Base_Scene {
 			context,
 			program_state,
 			curve2_transform,
-			this.materials.road
+			this.materials.curve
 		);
 
 		let curve3l_collider = new Curve_Collider(30, 100, 41, 2, 2);
