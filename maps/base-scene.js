@@ -1,6 +1,7 @@
 import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Shape_From_File } from '../tiny-graphics-stuff/obj-file-demo.js';
 import { Text_Line } from '../tiny-graphics-stuff/text-demo.js';
+import { Texture_Road,Texture_Curve } from '../tiny-graphics-stuff/custom-textures.js';
 
 const {
 	Vector,
