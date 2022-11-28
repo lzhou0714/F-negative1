@@ -355,6 +355,7 @@ export class GameMap extends Base_Scene {
 		let sphereTransform = model_transform.times(
 			Mat4.scale(500, 500, 500)
 		);
+
 		this.shapes.sphere.draw(
 			context,
 			program_state,

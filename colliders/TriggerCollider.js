@@ -41,10 +41,10 @@ export class Trigger_Collider extends Collider {
 			}
 		}
 
-        if (resx != x || resy != y) {
-            callback();
-        }
+		if (resx != x || resy != y) {
+			callback();
+		}
 
-		// return { resx: resx, resy: resy };
+		return { resx: newx, resy: newy };
 	}
 }
