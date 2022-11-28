@@ -377,17 +377,42 @@ export class BaseMap extends Base_Scene {
 		);
 	}
 
-	draw_curve(context, program_state) {
-		this.model_transform = this.model_transform.times(
-			Mat4.rotation(Math.PI / 2, 0, 1, 0)
-		);
+	draw_curve(context, program_state,direction) {
+		let xScale,xTrans,adjustAngle, adjustX;
+		
+		if (direction == 'r'){ //turn right config
+			xTrans = 30
+			xScale = 20;
+			adjustAngle = -Math.PI/2;
+			adjustX = -30	
+			
+		}
+		else {//turn leftw config
+			xTrans = -30;
+			xScale = -20;
+			adjustAngle = Math.PI/2;
+			adjustX = 30;
+		}
+	
+		this.model_transform = this.model_transform
+				.times(Mat4.translation(xTrans,0, 0))
+				
 
-		this.shapes.quarter_curve.draw(
-			context,
-			program_state,
-			this.model_transform.times(Mat4.scale(20, 20, 1)),
-			this.materials.road
-		);
+			this.shapes.quarter_curve.draw(
+				context,
+				program_state,
+				this.model_transform.times(Mat4.scale(xScale, -20, 1)),
+				this.materials.curve
+			);
+
+			//adjust for next track
+			//change orientation
+			//change position
+			this.model_transform = this.model_transform
+				.times(Mat4.rotation(adjustAngle, 0, 0, 1)) 
+				.times(Mat4.translation(adjustX, 0, 0));
+
+
 	}
 
 	display(context, program_state) {
