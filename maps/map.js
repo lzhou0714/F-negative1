@@ -387,7 +387,7 @@ export class BaseMap extends Base_Scene {
 			adjustX = -30	
 			
 		}
-		else {//turn left config
+		else {//turn leftw config
 			xTrans = -30;
 			xScale = -20;
 			adjustAngle = Math.PI/2;

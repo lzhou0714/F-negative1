@@ -75,7 +75,7 @@ export class Texture_Road extends Textured_Phong {
                     float y = mod(new_coord.y, 50.0); //make strip repeat twice in y direction
 
                     //  strip
-                    if (x > 5.5 && x <9.5 && (y > 23.7 && y < 26.25)){
+                    if (x > 0.0 && x <4.5 && (y > 23.7 && y < 26.25)){
                         tex_color = vec4(1,1,1,1);
                     }
 
