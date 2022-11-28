@@ -441,7 +441,7 @@ export class BaseMap extends Base_Scene {
 				program_state,
 				this.model_transform
 					.times(Mat4.scale(xWallOuter, -21, 1)),
-				this.materials.wall
+				this.materials.curved_wall
 			);
 		
 			this.shapes.inner_curved_wall.draw(
@@ -449,7 +449,7 @@ export class BaseMap extends Base_Scene {
 				program_state,
 				this.model_transform
 					.times(Mat4.scale(xWallInner, -10, 1)),
-				this.materials.wall
+				this.materials.curved_wall
 			);
 
 			//adjust for next track
