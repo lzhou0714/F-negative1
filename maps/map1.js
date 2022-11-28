@@ -57,7 +57,6 @@ export class GameMap extends Base_Scene {
 		this.num_coins = 5;
 		this.rad = 1.25;
 		this.coin_collected = new Array(this.num_coins).fill(false);
-		this.score = 0;
 
 		// Key presses
 		this.keyListeners = {};

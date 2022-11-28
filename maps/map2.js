@@ -224,7 +224,10 @@ export class GameMap extends Base_Scene {
 	}
 
 	collect_coin(radius, x, y, index) {
-		if (this.sphere_collider(radius, x, y)) {
+		if (
+			this.sphere_collider(radius, x, y) &&
+			!this.coin_collected[index]
+		) {
 			this.score += 1;
 			this.coin_collected[index] = true;
 		}
@@ -477,5 +480,8 @@ export class GameMap extends Base_Scene {
 		}
 
 		this.model_transform = Mat4.identity();
+
+		const score = document.querySelector('.score');
+		score.textContent = `Score: ${this.score}`;
 	}
 }
