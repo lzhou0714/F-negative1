@@ -5,14 +5,14 @@ export const makeTimer = (time) => {
 	const gameOver = () => {
 		clearInterval(timer);
 
-		// let modal = document.getElementById('myModal');
-
-		window.location = '/index.html';
+		const defeat = document.querySelector('.modal-defeat');
+		defeat.style.display = 'block';
 		// When the user clicks the button, open the modal
 	};
 
 	const updateTimer = () => {
 		timeLeft = timeLeft - 1;
+
 		if (timeLeft >= 0) {
 			timer.textContent = `Time: ${timeLeft}s`;
 		} else {
@@ -21,4 +21,5 @@ export const makeTimer = (time) => {
 	};
 
 	const timerInterval = setInterval(updateTimer, 1000);
+	return timerInterval;
 };

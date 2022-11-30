@@ -35,7 +35,7 @@ export class BaseMap extends Base_Scene {
 		this.outline = false;
 		this.sway = true;
 
-		makeTimer(180);
+		this.timer = makeTimer(120);
 		// Transform
 
 		this.x = 0;
@@ -272,8 +272,6 @@ export class BaseMap extends Base_Scene {
 
 				collided = true;
 				// return;
-				//console.log(this.colliders[i]);
-				//console.log(this.colliders);
 				this.collided = true;
 				return;
 			}
@@ -486,7 +484,6 @@ export class BaseMap extends Base_Scene {
 		const z =
 			this.model_transform[2][this.model_transform.length - 1];
 
-
 		if (trigger) {
 			const temp = this.trigger_count;
 			const trigger = () => {
@@ -496,11 +493,23 @@ export class BaseMap extends Base_Scene {
 
 			if (this.horizontal) {
 				this.colliders.push(
-					new Trigger_Collider(x, y - width - 1, 1, width * 2 + 2, trigger)
+					new Trigger_Collider(
+						x,
+						y - width - 1,
+						1,
+						width * 2 + 2,
+						trigger
+					)
 				);
 			} else {
 				this.colliders.push(
-					new Trigger_Collider(x - width - 1, y, width * 2 + 2, 1, trigger)
+					new Trigger_Collider(
+						x - width - 1,
+						y,
+						width * 2 + 2,
+						1,
+						trigger
+					)
 				);
 			}
 
@@ -630,7 +639,16 @@ export class BaseMap extends Base_Scene {
 				this.trigger_check = { 0: true };
 				this.trigger_count = 1;
 				if (this.lap == 3) {
-					console.log('You Win');
+					let modal = document.getElementById('myModal');
+					let score = document.querySelector('.final-score');
+					let time = document.querySelector('.time');
+					let time_left = document.querySelector('.time-left');
+					score.textContent = `Score: ${this.score}`;
+
+					time.textContent = time_left.textContent;
+					clearInterval(this.timer);
+
+					modal.style.display = 'block';
 				}
 			}
 		};
