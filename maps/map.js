@@ -267,7 +267,10 @@ export class BaseMap extends Base_Scene {
 
 				collided = true;
 				// return;
+				console.log(this.colliders[i]);
+				console.log(this.colliders);
 				this.collided = true;
+				return;
 			}
 		}
 
@@ -614,6 +617,7 @@ export class BaseMap extends Base_Scene {
 	}
 
 	draw_curve(context, program_state, direction) {
+		// console.log("drawing");
 		let xScale,
 			xTrans,
 			adjustAngle,
@@ -746,6 +750,10 @@ export class BaseMap extends Base_Scene {
 		this.model_transform = Mat4.identity();
 		this.road_counter = 0;
 		this.colliders = [];
+
 		this.trigger_count = 1;
+
+		this.mapOrientation = 0;
+		this.horizontal = false;
 	}
 }
