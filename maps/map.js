@@ -267,8 +267,8 @@ export class BaseMap extends Base_Scene {
 
 				collided = true;
 				// return;
-				console.log(this.colliders[i]);
-				console.log(this.colliders);
+				//console.log(this.colliders[i]);
+				//console.log(this.colliders);
 				this.collided = true;
 				return;
 			}
@@ -396,7 +396,7 @@ export class BaseMap extends Base_Scene {
 			this.draw_coins(context, program_state);
 		}
 
-		if (trigger) {
+		if (false) {
 			let temp_model_transform = this.model_transform.times(
 				Mat4.translation(0, 10, 1)
 			);
@@ -481,6 +481,26 @@ export class BaseMap extends Base_Scene {
 		const z =
 			this.model_transform[2][this.model_transform.length - 1];
 
+
+		if (trigger) {
+			const temp = this.trigger_count;
+			const trigger = () => {
+				this.trigger_check[temp] = this.trigger_check[temp - 1];
+				console.log(this.trigger_check);
+			};
+
+			if (this.horizontal) {
+				this.colliders.push(
+					new Trigger_Collider(x, y - width, 1, width * 2, trigger)
+				);
+			} else {
+				this.colliders.push(
+					new Trigger_Collider(x - width, y, width * 2, 1, trigger)
+				);
+			}
+
+			this.trigger_count += 1;
+		}
 		// let colx, coly, colxw, colyw;
 
 		// if (this.horizontal) {
