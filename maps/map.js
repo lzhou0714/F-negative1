@@ -394,7 +394,7 @@ export class BaseMap extends Base_Scene {
 			this.draw_coins(context, program_state);
 		}
 
-		if (trigger) {
+		if (false) {
 			let temp_model_transform = this.model_transform.times(
 				Mat4.translation(0, 10, 1)
 			);
@@ -479,6 +479,37 @@ export class BaseMap extends Base_Scene {
 		const z =
 			this.model_transform[2][this.model_transform.length - 1];
 
+		if (trigger) {
+			const temp = this.trigger_count;
+			const trigger = () => {
+				this.trigger_check[temp] = this.trigger_check[temp - 1];
+				console.log(this.trigger_check);
+			};
+
+			if (this.horizontal) {
+				this.colliders.push(
+					new Trigger_Collider(
+						x,
+						y - width - 1,
+						1,
+						width * 2 + 2,
+						trigger
+					)
+				);
+			} else {
+				this.colliders.push(
+					new Trigger_Collider(
+						x - width - 1,
+						y,
+						width * 2 + 2,
+						1,
+						trigger
+					)
+				);
+			}
+
+			this.trigger_count += 1;
+		}
 		// let colx, coly, colxw, colyw;
 
 		// if (this.horizontal) {
@@ -573,7 +604,7 @@ export class BaseMap extends Base_Scene {
 	draw_win(context, program_state) {
 		let prev = this.materials.road;
 		this.materials.road = this.materials.win;
-		this.draw_road(context, program_state, 10, 10);
+		this.draw_road(context, program_state);
 
 		let temp_model_transform = this.model_transform.times(
 			Mat4.translation(0, -10, 1)
@@ -618,7 +649,7 @@ export class BaseMap extends Base_Scene {
 		};
 
 		this.colliders.push(
-			new Trigger_Collider(x - 12.5, y, 25, 1, trigger)
+			new Trigger_Collider(x - 10, y, 20, 1, trigger)
 		);
 		this.materials.road = prev;
 	}
