@@ -509,7 +509,39 @@ export class BaseMap extends Base_Scene {
 		this.road_counter += 1;
 	}
 
+	draw_flag(context,program_state,model_transform){
+		let left_pole_transform = model_transform
+			.times(Mat4.translation(-11, 0, 0))
+			.times(Mat4.scale(0.25, 0.25, 15));
+		let right_pole_transform = model_transform
+			.times(Mat4.translation(11, 0, 0))
+			.times(Mat4.scale(0.25, 0.25, 15));
+		let flag_transform = model_transform
+			.times(Mat4.rotation(Math.PI/2,1, 0, 0))
+			.times(Mat4.translation(0, 7, 0))
+			.times(Mat4.scale(10, 1.25, 1));
+		
+		this.shapes.pole.draw(
+			context,
+			program_state,
+			left_pole_transform,
+			this.materials.metal)
+		this.shapes.pole.draw(
+			context,
+			program_state,
+			right_pole_transform,
+			this.materials.metal)
+		this.shapes.plane.draw(
+			context,
+			program_state,
+			flag_transform,
+			this.materials.flag
+		)
+
+	}
+
 	draw_win(context, program_state) {
+		
 		let prev = this.materials.road;
 		this.materials.road = this.materials.win;
 		this.draw_road(context, program_state, 10, 10);
@@ -517,6 +549,7 @@ export class BaseMap extends Base_Scene {
 		let temp_model_transform = this.model_transform.times(
 			Mat4.translation(0, -10, 1)
 		);
+		this.draw_flag(context, program_state,temp_model_transform);
 
 		const x =
 			temp_model_transform[0][temp_model_transform.length - 1];
@@ -527,6 +560,10 @@ export class BaseMap extends Base_Scene {
 
 		this.colliders.push(new Box_Collider(x - 12.5, y, 25, 4));
 		this.materials.road = prev;
+		
+	
+
+		
 	}
 
 	draw_curve(context, program_state, direction) {

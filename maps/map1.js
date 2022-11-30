@@ -66,7 +66,6 @@ export class GameMap extends BaseMap {
 		// 	this.materials.road
 		// );
 
-		// this.draw_win(context, program_state);
 		this.draw_road(context, program_state, true);
 		// this.draw_road(context, program_state, 10, 10);
 		//r = turn right, l = turn left
