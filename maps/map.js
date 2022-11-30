@@ -35,7 +35,7 @@ export class BaseMap extends Base_Scene {
 		this.outline = false;
 		this.sway = true;
 
-		this.timer = makeTimer(180);
+		this.timer = makeTimer(120);
 		// Transform
 
 		this.x = 0;

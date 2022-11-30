@@ -1,5 +1,5 @@
 export const makeTimer = (time) => {
-	let timeLeft = 10;
+	let timeLeft = time;
 	const timer = document.querySelector('.time-left');
 
 	const gameOver = () => {
