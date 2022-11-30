@@ -630,10 +630,15 @@ export class BaseMap extends Base_Scene {
 				const laps = document.querySelector('.laps');
 				console.log(laps);
 				this.lap += 1;
-				laps.textContent = `Laps: ${this.lap}/3`;
+				if (this.lap == 4) {
+					laps.textContent = `Laps: Done`;
+				} else {
+					laps.textContent = `Laps: ${this.lap}/3`;
+				}
+
 				this.trigger_check = { 0: true };
 				this.trigger_count = 1;
-				if (this.lap == 3) {
+				if (this.lap == 4) {
 					let modal = document.getElementById('myModal');
 					let score = document.querySelector('.final-score');
 					let time = document.querySelector('.time');
