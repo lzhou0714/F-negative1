@@ -52,12 +52,16 @@ export class BaseMap extends Base_Scene {
 
 		// Colliders
 		this.colliders = new Array();
+		this.mapOrientation = 0;
+		this.horizontal = false;
 
 		// Coins
 		this.num_coins = 5;
 		this.rad = 1.25;
-		this.coin_collected = new Array(this.num_coins).fill(false);
+		this.coin_collected = {};
 		this.score = 0;
+
+		this.road_counter = 0;
 
 		// Key presses
 		this.keyListeners = {};
@@ -203,15 +207,6 @@ export class BaseMap extends Base_Scene {
 		return model_transform.times(Mat4.scale(1, 1 / 1.5, 1)); // Unscale before return
 	}
 
-	draw_coins(context, program_state, model_transform) {
-		this.shapes.coin.draw(
-			context,
-			program_state,
-			model_transform,
-			this.materials.coin
-		);
-	}
-
 	sphere_collider(radius, x, y) {
 		let dist = Math.sqrt(
 			Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2)
@@ -238,6 +233,7 @@ export class BaseMap extends Base_Scene {
 		let newx = this.x + deltax;
 		let newy = this.y + deltay;
 		let len = this.colliders.length;
+		let collided = false;
 		for (let i = 0; i < len; i++) {
 			// console.log(this.colliders[i]);
 			let res = this.colliders[i].check_collision(newx, newy);
@@ -245,11 +241,14 @@ export class BaseMap extends Base_Scene {
 			if (res.resx != newx || res.resy != newy) {
 				this.x = res.resx;
 				this.y = res.resy;
-				return;
+				collided = true;
+				// return;
 			}
 		}
-		this.x = newx;
-		this.y = newy;
+		if (!collided) {
+			this.x = newx;
+			this.y = newy;
+		}
 	}
 
 	draw_car(context, program_state, model_transform) {
@@ -324,7 +323,52 @@ export class BaseMap extends Base_Scene {
 		// program_state.set_camera(model_transform.times(Mat4.translation(0, 5, -10)).times(Mat4.look_at(vec3(0, 5, 20), vec3(0, 0, 0), vec3(0, 1, 0))));
 	}
 
-	draw_road(context, program_state, width = 10, length = 10) {
+	draw_coins(context, program_state) {
+		let t, dt;
+		(t = program_state.animation_time / 1000),
+			(dt = program_state.animation_delta_time / 1000);
+		const cx =
+			this.model_transform[0][this.model_transform.length - 1];
+		const cy =
+			this.model_transform[1][this.model_transform.length - 1];
+		const z =
+			this.model_transform[2][this.model_transform.length - 1];
+
+		for (let i = 0; i < 5; i++) {
+			const coin_num = this.road_counter * 5 + i + 1;
+			if (!(coin_num in this.coin_collected)) {
+				this.coin_collected[coin_num] = false;
+			}
+
+			const coin_pos = this.model_transform
+				.times(Mat4.translation(0, 0, 1.35))
+				.times(Mat4.translation(0, 5 * i + 1, 0))
+				.times(Mat4.rotation(t, 0, 0, 1));
+
+			this.collect_coin(1.3, cx, cy + i * 5, coin_num);
+
+			if (!this.coin_collected[coin_num]) {
+				this.shapes.coin.draw(
+					context,
+					program_state,
+					coin_pos,
+					this.materials.coin
+				);
+			}
+		}
+	}
+
+	draw_road(
+		context,
+		program_state,
+		coins = false,
+		width = 10,
+		length = 10
+	) {
+		if (coins) {
+			this.draw_coins(context, program_state);
+		}
+
 		this.model_transform = this.model_transform.times(
 			Mat4.translation(0, length, 0)
 		);
@@ -339,34 +383,39 @@ export class BaseMap extends Base_Scene {
 			road,
 			this.materials.road
 		);
-		
-		let wally = -length+1;
-		let rightwall_transform = this.model_transform
-			.times(Mat4.translation(length+1, wally, 1));
-		let leftwall_transform = this.model_transform
-			.times(Mat4.translation(-length-1, wally, 1));
+
+		let wally = -length + 1;
+		let rightwall_transform = this.model_transform.times(
+			Mat4.translation(length + 1, wally, 1)
+		);
+		let leftwall_transform = this.model_transform.times(
+			Mat4.translation(-length - 1, wally, 1)
+		);
 		for (let i = 1; i <= 10; i++) {
 			//leftside
 			this.shapes.wall.draw(
 				context,
 				program_state,
-				leftwall_transform.times(Mat4.rotation(Math.PI/2, 1,0, 0)),
+				leftwall_transform.times(Mat4.rotation(Math.PI / 2, 1, 0, 0)),
 				this.materials.wall
-			)
+			);
 			//right side
 			this.shapes.wall.draw(
 				context,
 				program_state,
-				rightwall_transform.times(Mat4.rotation(Math.PI/2, 1,0, 0)),
+				rightwall_transform.times(
+					Mat4.rotation(Math.PI / 2, 1, 0, 0)
+				),
 				this.materials.wall
-			)
-			wally +=2;
-			rightwall_transform = this.model_transform
-			.times(Mat4.translation(length+1, wally, 1));
-			leftwall_transform = this.model_transform
-			.times(Mat4.translation(-length-1, wally, 1));
+			);
+			wally += 2;
+			rightwall_transform = this.model_transform.times(
+				Mat4.translation(length + 1, wally, 1)
+			);
+			leftwall_transform = this.model_transform.times(
+				Mat4.translation(-length - 1, wally, 1)
+			);
 		}
-
 
 		const x =
 			this.model_transform[0][this.model_transform.length - 1];
@@ -375,27 +424,64 @@ export class BaseMap extends Base_Scene {
 		const z =
 			this.model_transform[2][this.model_transform.length - 1];
 
-		this.colliders.push(
-			new Box_Collider(
-				x - width - 1,
-				y - length - 1,
-				2,
-				length * 2 + 10
-			)
-		);
 
-		this.colliders.push(
-			new Box_Collider(
-				x + width - 1,
-				y - length - 1,
-				2,
-				length * 2 + 10
-			)
-		);
+		// let colx, coly, colxw, colyw;
+
+		// if (this.horizontal) {
+		// 	coly = x - width - 1;
+		// 	colx = y - length - 1;
+		// 	colyw = 1.5;
+		// 	colxw = length * 2 + 5;
+		// } else {
+		// 	colx = x - width - 1;
+		// 	coly = y - length - 1;
+		// 	colxw = 1.5;
+		// 	colyw = length * 2 + 5;
+		// }
+
+		if (!this.horizontal) {
+			this.colliders.push(
+				new Box_Collider(
+					x - width - 1,
+					y - length - 1,
+					1.5,
+					length * 2 + 5
+				)
+			);
+
+			this.colliders.push(
+				new Box_Collider(
+					x + width - 1,
+					y - length - 1,
+					1.5,
+					length * 2 + 5
+				)
+			);
+		} else {
+			this.colliders.push(
+				new Box_Collider(
+					x - length - 1,
+					y - width - 1,
+					length * 2 + 2,
+					1.5
+				)
+			);
+
+			this.colliders.push(
+				new Box_Collider(
+					x - length - 1,
+					y + width - 1,
+					length * 2 + 2,
+					1.5
+				)
+			);
+		}
 
 		this.model_transform = this.model_transform.times(
 			Mat4.translation(0, length, 0)
 		);
+
+		this.road_counter += 1;
 	}
 
 	draw_win(context, program_state) {
@@ -427,29 +513,62 @@ export class BaseMap extends Base_Scene {
 	}
 
 	draw_curve(context, program_state,direction) {
-		let xScale,xTrans,adjustAngle, adjustX,xWallOuter, xWallInner;
+		let xScale,xTrans,adjustAngle, adjustX,xWallOuter, xWallInner, quadrant;
 		
 		if (direction == 'r'){ //turn right config
 			xTrans = 30
 			xScale = 20;
 			xWallOuter = 21;
 			xWallInner = 10;
-			adjustAngle = -Math.PI/2;
-			adjustX = -30	
-			
-		}
-		else {//turn leftw config
+			adjustAngle = -Math.PI / 2;
+			adjustX = -30;
+		} else {
+			//turn leftw config
 			xTrans = -30;
 			xScale = -20;
 			xWallOuter = -21;
 			xWallInner = -10;
-			adjustAngle = Math.PI/2;
+			adjustAngle = Math.PI / 2;
 			adjustX = 30;
 		}
+
+		if (this.mapOrientation == 0) {
+			if (direction == 'r') {
+				quadrant = 2;
+			} else {
+				quadrant = 1;
+			}
+		} else if (this.mapOrientation == 3 * Math.PI/2) {
+			if (direction == 'r') {
+				quadrant = 1;
+			} else {
+				quadrant = 4;
+			}
+		} else if (this.mapOrientation == Math.PI) {
+			if (direction == 'r') {
+				quadrant = 4;
+			} else {
+				quadrant = 3;
+			}
+		} else {
+			if (direction == 'r') {
+				quadrant = 3;
+			} else {
+				quadrant = 2;
+			}
+		}
+
+		this.mapOrientation += adjustAngle;
+		if (this.mapOrientation < 0) {
+			this.mapOrientation = 3 * Math.PI / 2;
+		} else if (this.mapOrientation > 3 * Math.PI / 2) {
+			this.mapOrientation = 0;
+		}
+
 	
 		this.model_transform = this.model_transform
-				.times(Mat4.translation(xTrans,0, 0))
-				
+				.times(Mat4.translation(xTrans,0, 0));
+
 
 			this.shapes.quarter_curve.draw(
 				context,
@@ -473,8 +592,33 @@ export class BaseMap extends Base_Scene {
 				this.materials.curved_wall
 			);
 
+		const x = this.model_transform[0][this.model_transform.length - 1];
+		const y = this.model_transform[1][this.model_transform.length - 1];
+		const z = this.model_transform[2][this.model_transform.length - 1];
+
+		this.colliders.push(
+			new Curve_Collider(
+				x,
+				y,
+				Math.abs(xScale) - 1,
+				2,
+				quadrant
+			)
+		);
+
+		this.colliders.push(
+			new Curve_Collider(
+				x,
+				y,
+				Math.abs(xScale) + Math.abs(xWallOuter),
+				2,
+				quadrant
+			)
+		);
+
 			//adjust for next track
 			//change orientation
+			this.horizontal = !this.horizontal;
 			//change position
 			this.model_transform = this.model_transform
 				.times(Mat4.rotation(adjustAngle, 0, 0, 1)) 
@@ -495,27 +639,12 @@ export class BaseMap extends Base_Scene {
 
 		this.draw_car(context, program_state, model_transform);
 		//radius of coin = 1.3
-		let cy = 20,
-			cx = 0;
-		let coin_init = model_transform.times(
-			Mat4.translation(cx, cy, 1.35)
-		);
-
-		for (let i = 0; i < this.num_coins; i++) {
-			let coin_pos = coin_init
-				.times(Mat4.translation(0, 5 * i, 0))
-				.times(Mat4.rotation(t, 0, 0, 1));
-
-			this.collect_coin(1.3, cx, cy + i * 5, i);
-			if (!this.coin_collected[i]) {
-				this.draw_coins(context, program_state, coin_pos);
-			}
-		}
 
 		this.model_transform = Mat4.identity();
 		const score = document.querySelector('.score');
 		score.textContent = `Score: ${this.score}`;
 
 		this.model_transform = Mat4.identity();
+		this.road_counter = 0;
 	}
 }

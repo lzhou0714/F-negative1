@@ -1,15 +1,24 @@
 import { Collider } from './Collider.js';
 
 export class Trigger_Collider extends Collider {
-	constructor(x, y, xlen, ylen) {
+	constructor(
+		x,
+		y,
+		xlen,
+		ylen,
+		callback = () => {
+			console.log('collided');
+		}
+	) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.w = xlen;
 		this.l = ylen;
+		this.callback = callback;
 	}
 
-	check_collision(x, y, callback) {
+	check_collision(x, y) {
 		let resx = x;
 		let resy = y;
 		if (
@@ -42,9 +51,9 @@ export class Trigger_Collider extends Collider {
 		}
 
 		if (resx != x || resy != y) {
-			callback();
+			this.callback();
 		}
 
-		return { resx: newx, resy: newy };
+		return { resx: x, resy: y };
 	}
 }
