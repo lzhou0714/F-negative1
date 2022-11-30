@@ -62,7 +62,7 @@ export class BaseMap extends Base_Scene {
 		this.score = 0;
 
 		this.road_counter = 0;
-
+		this.collided = false;
 		// Key presses
 		this.keyListeners = {};
 
@@ -116,12 +116,26 @@ export class BaseMap extends Base_Scene {
 	make_control_panel() {
 		this.addHoldKey(
 			'w',
-			() => (this.vely += 0.002),
+			() => {
+				if (!this.collided) {
+					this.vely += 0.002;
+				}
+			},
+
 			'Accelerate',
 			125
 		);
 
-		this.addHoldKey('s', () => (this.vely -= 0.002), 'Brake', 125);
+		this.addHoldKey(
+			's',
+			() => {
+				if (!this.collided) {
+					this.vely -= 0.002;
+				}
+			},
+			'Brake',
+			125
+		);
 		this.addHoldKey(
 			'd',
 			() => {
@@ -241,17 +255,21 @@ export class BaseMap extends Base_Scene {
 		let newy = this.y + deltay;
 		let len = this.colliders.length;
 		let collided = false;
+		this.collided = false;
+
 		for (let i = 0; i < len; i++) {
 			// console.log(this.colliders[i]);
 			let res = this.colliders[i].check_collision(newx, newy);
 
 			if (res.resx != newx || res.resy != newy) {
+				this.collided = true;
 				this.x = res.resx;
 				this.y = res.resy;
 				collided = true;
 				// return;
 			}
 		}
+
 		if (!collided) {
 			this.x = newx;
 			this.y = newy;
@@ -352,7 +370,12 @@ export class BaseMap extends Base_Scene {
 				.times(Mat4.translation(0, 5 * i + 1, 0))
 				.times(Mat4.rotation(t, 0, 0, 1));
 
-			this.collect_coin(1.3, cx, cy + i * 5, coin_num);
+			this.collect_coin(
+				1.3,
+				coin_pos[0][coin_pos.length - 1],
+				coin_pos[1][coin_pos.length - 1],
+				coin_num
+			);
 
 			if (!this.coin_collected[coin_num]) {
 				this.shapes.coin.draw(
@@ -431,7 +454,6 @@ export class BaseMap extends Base_Scene {
 		const z =
 			this.model_transform[2][this.model_transform.length - 1];
 
-
 		// let colx, coly, colxw, colyw;
 
 		// if (this.horizontal) {
@@ -491,11 +513,18 @@ export class BaseMap extends Base_Scene {
 		this.road_counter += 1;
 	}
 
-	draw_curve(context, program_state,direction) {
-		let xScale,xTrans,adjustAngle, adjustX,xWallOuter, xWallInner, quadrant;
-		
-		if (direction == 'r'){ //turn right config
-			xTrans = 30
+	draw_curve(context, program_state, direction) {
+		let xScale,
+			xTrans,
+			adjustAngle,
+			adjustX,
+			xWallOuter,
+			xWallInner,
+			quadrant;
+
+		if (direction == 'r') {
+			//turn right config
+			xTrans = 30;
 			xScale = 20;
 			xWallOuter = 21;
 			xWallInner = 10;
@@ -517,7 +546,7 @@ export class BaseMap extends Base_Scene {
 			} else {
 				quadrant = 1;
 			}
-		} else if (this.mapOrientation == 3 * Math.PI/2) {
+		} else if (this.mapOrientation == (3 * Math.PI) / 2) {
 			if (direction == 'r') {
 				quadrant = 1;
 			} else {
@@ -539,50 +568,44 @@ export class BaseMap extends Base_Scene {
 
 		this.mapOrientation += adjustAngle;
 		if (this.mapOrientation < 0) {
-			this.mapOrientation = 3 * Math.PI / 2;
-		} else if (this.mapOrientation > 3 * Math.PI / 2) {
+			this.mapOrientation = (3 * Math.PI) / 2;
+		} else if (this.mapOrientation > (3 * Math.PI) / 2) {
 			this.mapOrientation = 0;
 		}
 
-	
-		this.model_transform = this.model_transform
-				.times(Mat4.translation(xTrans,0, 0));
+		this.model_transform = this.model_transform.times(
+			Mat4.translation(xTrans, 0, 0)
+		);
 
+		this.shapes.quarter_curve.draw(
+			context,
+			program_state,
+			this.model_transform.times(Mat4.scale(xScale, -20, 1)),
+			this.materials.curve
+		);
+		this.shapes.outer_curved_wall.draw(
+			context,
+			program_state,
+			this.model_transform.times(Mat4.scale(xWallOuter, -21, 1)),
+			this.materials.curved_wall
+		);
 
-			this.shapes.quarter_curve.draw(
-				context,
-				program_state,
-				this.model_transform.times(Mat4.scale(xScale, -20, 1)),
-				this.materials.curve
-			);
-			this.shapes.outer_curved_wall.draw(
-				context,
-				program_state,
-				this.model_transform
-					.times(Mat4.scale(xWallOuter, -21, 1)),
-				this.materials.curved_wall
-			);
-		
-			this.shapes.inner_curved_wall.draw(
-				context,
-				program_state,
-				this.model_transform
-					.times(Mat4.scale(xWallInner, -10, 1)),
-				this.materials.curved_wall
-			);
+		this.shapes.inner_curved_wall.draw(
+			context,
+			program_state,
+			this.model_transform.times(Mat4.scale(xWallInner, -10, 1)),
+			this.materials.curved_wall
+		);
 
-		const x = this.model_transform[0][this.model_transform.length - 1];
-		const y = this.model_transform[1][this.model_transform.length - 1];
-		const z = this.model_transform[2][this.model_transform.length - 1];
+		const x =
+			this.model_transform[0][this.model_transform.length - 1];
+		const y =
+			this.model_transform[1][this.model_transform.length - 1];
+		const z =
+			this.model_transform[2][this.model_transform.length - 1];
 
 		this.colliders.push(
-			new Curve_Collider(
-				x,
-				y,
-				Math.abs(xScale) - 1,
-				2,
-				quadrant
-			)
+			new Curve_Collider(x, y, Math.abs(xScale) - 1, 2, quadrant)
 		);
 
 		this.colliders.push(
@@ -595,15 +618,13 @@ export class BaseMap extends Base_Scene {
 			)
 		);
 
-			//adjust for next track
-			//change orientation
-			this.horizontal = !this.horizontal;
-			//change position
-			this.model_transform = this.model_transform
-				.times(Mat4.rotation(adjustAngle, 0, 0, 1)) 
-				.times(Mat4.translation(adjustX, 0, 0));
-
-
+		//adjust for next track
+		//change orientation
+		this.horizontal = !this.horizontal;
+		//change position
+		this.model_transform = this.model_transform
+			.times(Mat4.rotation(adjustAngle, 0, 0, 1))
+			.times(Mat4.translation(adjustX, 0, 0));
 	}
 
 	display(context, program_state) {
