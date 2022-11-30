@@ -72,14 +72,31 @@ export class GameMap extends BaseMap {
 		this.draw_win(context, program_state);
 		// this.draw_road(context, program_statwe, 10, 10);
 		//r = turn right, l = turn left
-		// this.draw_curve(context, program_state, 'l');
+		this.draw_curve(context, program_state, 'l');
 		this.draw_road(context, program_state);
 		this.draw_road(context, program_state);
 		this.draw_curve(context, program_state, 'r');
-		this.draw_road(context, program_state, false, true);
-		this.draw_road(context, program_state, false, true);
-		this.draw_road(context, program_state, false, true);
-
+		this.draw_road(context, program_state, true, true);
+		this.draw_road(context, program_state);
+		this.draw_curve(context, program_state, 'r');
+		this.draw_road(context, program_state);
+		this.draw_curve(context, program_state, 'l');
+		this.draw_road(context, program_state);
+		this.draw_curve(context, program_state, 'r');
+		this.draw_road(context, program_state);
+		this.draw_curve(context, program_state, 'r');
+		this.draw_road(context, program_state, true, true);
+		this.draw_road(context, program_state, true, true);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_curve(context, program_state, 'r');
+		this.draw_curve(context, program_state, 'r');
 
 	}
 }

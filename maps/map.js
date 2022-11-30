@@ -491,11 +491,11 @@ export class BaseMap extends Base_Scene {
 
 			if (this.horizontal) {
 				this.colliders.push(
-					new Trigger_Collider(x, y - width, 1, width * 2, trigger)
+					new Trigger_Collider(x, y - width - 1, 1, width * 2 + 2, trigger)
 				);
 			} else {
 				this.colliders.push(
-					new Trigger_Collider(x - width, y, width * 2, 1, trigger)
+					new Trigger_Collider(x - width - 1, y, width * 2 + 2, 1, trigger)
 				);
 			}
 
@@ -595,7 +595,7 @@ export class BaseMap extends Base_Scene {
 	draw_win(context, program_state) {
 		let prev = this.materials.road;
 		this.materials.road = this.materials.win;
-		this.draw_road(context, program_state, 10, 10);
+		this.draw_road(context, program_state);
 
 		let temp_model_transform = this.model_transform.times(
 			Mat4.translation(0, -10, 1)
