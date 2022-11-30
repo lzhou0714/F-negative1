@@ -2,8 +2,8 @@ import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Curve_Collider } from '../colliders/CurveCollider.js';
 import { Box_Collider } from '../colliders/BoxCollider.js';
 import { Base_Scene } from './base-scene.js';
-import { Trigger_Collider } from '../colliders/TriggerCollider.js';
 import { makeTimer } from '../util/setTimer.js';
+import { Trigger_Collider } from '../colliders/TriggerCollider.js';
 const {
 	Vector,
 	Vector3,
@@ -56,7 +56,6 @@ export class BaseMap extends Base_Scene {
 		this.colliders = new Array();
 		this.mapOrientation = 0;
 		this.horizontal = false;
-		this.laps = 0;
 
 		// Coins
 		this.num_coins = 5;
@@ -122,6 +121,8 @@ export class BaseMap extends Base_Scene {
 			() => {
 				if (!this.collided) {
 					this.vely += 0.002;
+				} else {
+					this.vely = this.vely > 0.03 ? 0.03 : this.vely;
 				}
 			},
 
@@ -391,11 +392,26 @@ export class BaseMap extends Base_Scene {
 		context,
 		program_state,
 		coins = false,
+		trigger = false,
 		width = 10,
 		length = 10
 	) {
 		if (coins) {
 			this.draw_coins(context, program_state);
+		}
+
+		if (trigger) {
+			let temp_model_transform = this.model_transform.times(
+				Mat4.translation(0, -10, 1)
+			);
+			const x =
+				temp_model_transform[0][temp_model_transform.length - 1];
+			const y =
+				temp_model_transform[1][temp_model_transform.length - 1];
+			const z =
+				temp_model_transform[2][temp_model_transform.length - 1];
+
+			this.colliders.push(new Trigger_Collider(x - 12.5, y, 25, 1));
 		}
 
 		this.model_transform = this.model_transform.times(
@@ -561,7 +577,6 @@ export class BaseMap extends Base_Scene {
 		const z =
 			temp_model_transform[2][temp_model_transform.length - 1];
 
-		
 		this.colliders.push(new Trigger_Collider(x - 12.5, y, 25, 1));
 		this.materials.road = prev;
 	}
@@ -650,7 +665,28 @@ export class BaseMap extends Base_Scene {
 			this.materials.curved_wall
 		);
 
-		//adjust for next track
+		//adjust for next trackw
+		const x =
+			this.model_transform[0][this.model_transform.length - 1];
+		const y =
+			this.model_transform[1][this.model_transform.length - 1];
+		const z =
+			this.model_transform[2][this.model_transform.length - 1];
+
+		this.colliders.push(
+			new Curve_Collider(x, y, Math.abs(xScale) - 1, 2, quadrant)
+		);
+
+		this.colliders.push(
+			new Curve_Collider(
+				x,
+				y,
+				Math.abs(xScale) + Math.abs(xWallOuter),
+				2,
+				quadrant
+			)
+		);
+
 		//change orientation
 		this.horizontal = !this.horizontal;
 		//change position
