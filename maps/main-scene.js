@@ -37,6 +37,8 @@ const map_number = urlParams.get('map_number')
 	? urlParams.get('map_number')
 	: 1;
 
+let timeLeft = 180;
+
 const { GameMap } = await import('./map' + map_number + '.js');
 
 const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo;
