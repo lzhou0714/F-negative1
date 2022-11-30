@@ -52,6 +52,8 @@ export class BaseMap extends Base_Scene {
 
 		// Colliders
 		this.colliders = new Array();
+		this.mapOrientation = 0;
+		this.horizontal = false;
 
 		// Coins
 		this.num_coins = 5;
@@ -245,6 +247,7 @@ export class BaseMap extends Base_Scene {
 		let newx = this.x + deltax;
 		let newy = this.y + deltay;
 		let len = this.colliders.length;
+		let collided = false;
 		for (let i = 0; i < len; i++) {
 			// console.log(this.colliders[i]);
 			let res = this.colliders[i].check_collision(newx, newy);
@@ -252,11 +255,14 @@ export class BaseMap extends Base_Scene {
 			if (res.resx != newx || res.resy != newy) {
 				this.x = res.resx;
 				this.y = res.resy;
-				return;
+				collided = true;
+				// return;
 			}
 		}
-		this.x = newx;
-		this.y = newy;
+		if (!collided) {
+			this.x = newx;
+			this.y = newy;
+		}
 	}
 
 	draw_car(context, program_state, model_transform) {
@@ -382,23 +388,58 @@ export class BaseMap extends Base_Scene {
 		const z =
 			this.model_transform[2][this.model_transform.length - 1];
 
-		this.colliders.push(
-			new Box_Collider(
-				x - width - 1,
-				y - length - 1,
-				2,
-				length * 2 + 10
-			)
-		);
 
-		this.colliders.push(
-			new Box_Collider(
-				x + width - 1,
-				y - length - 1,
-				2,
-				length * 2 + 10
-			)
-		);
+		// let colx, coly, colxw, colyw;
+
+		// if (this.horizontal) {
+		// 	coly = x - width - 1;
+		// 	colx = y - length - 1;
+		// 	colyw = 1.5;
+		// 	colxw = length * 2 + 5;
+		// } else {
+		// 	colx = x - width - 1;
+		// 	coly = y - length - 1;
+		// 	colxw = 1.5;
+		// 	colyw = length * 2 + 5;
+		// }
+
+		if (!this.horizontal) {
+			this.colliders.push(
+				new Box_Collider(
+					x - width - 1,
+					y - length - 1,
+					1.5,
+					length * 2 + 5
+				)
+			);
+
+			this.colliders.push(
+				new Box_Collider(
+					x + width - 1,
+					y - length - 1,
+					1.5,
+					length * 2 + 5
+				)
+			);
+		} else {
+			this.colliders.push(
+				new Box_Collider(
+					x - length - 1,
+					y - width - 1,
+					length * 2 + 2,
+					1.5
+				)
+			);
+
+			this.colliders.push(
+				new Box_Collider(
+					x - length - 1,
+					y + width - 1,
+					length * 2 + 2,
+					1.5
+				)
+			);
+		}
 
 		this.model_transform = this.model_transform.times(
 			Mat4.translation(0, length, 0)
@@ -406,7 +447,7 @@ export class BaseMap extends Base_Scene {
 	}
 
 	draw_curve(context, program_state,direction) {
-		let xScale,xTrans,adjustAngle, adjustX,xWallOuter, xWallInner;
+		let xScale,xTrans,adjustAngle, adjustX,xWallOuter, xWallInner, quadrant;
 		
 		if (direction == 'r'){ //turn right config
 			xTrans = 30
@@ -425,10 +466,44 @@ export class BaseMap extends Base_Scene {
 			adjustAngle = Math.PI/2;
 			adjustX = 30;
 		}
+
+		if (this.mapOrientation == 0) {
+			if (direction == 'r') {
+				quadrant = 2;
+			} else {
+				quadrant = 1;
+			}
+		} else if (this.mapOrientation == 3 * Math.PI/2) {
+			if (direction == 'r') {
+				quadrant = 1;
+			} else {
+				quadrant = 4;
+			}
+		} else if (this.mapOrientation == Math.PI) {
+			if (direction == 'r') {
+				quadrant = 4;
+			} else {
+				quadrant = 3;
+			}
+		} else {
+			if (direction == 'r') {
+				quadrant = 3;
+			} else {
+				quadrant = 2;
+			}
+		}
+
+		this.mapOrientation += adjustAngle;
+		if (this.mapOrientation < 0) {
+			this.mapOrientation = 3 * Math.PI / 2;
+		} else if (this.mapOrientation > 3 * Math.PI / 2) {
+			this.mapOrientation = 0;
+		}
+
 	
 		this.model_transform = this.model_transform
-				.times(Mat4.translation(xTrans,0, 0))
-				
+				.times(Mat4.translation(xTrans,0, 0));
+
 
 			this.shapes.quarter_curve.draw(
 				context,
@@ -452,8 +527,33 @@ export class BaseMap extends Base_Scene {
 				this.materials.curved_wall
 			);
 
+		const x = this.model_transform[0][this.model_transform.length - 1];
+		const y = this.model_transform[1][this.model_transform.length - 1];
+		const z = this.model_transform[2][this.model_transform.length - 1];
+
+		this.colliders.push(
+			new Curve_Collider(
+				x,
+				y,
+				Math.abs(xScale) - 1,
+				2,
+				quadrant
+			)
+		);
+
+		this.colliders.push(
+			new Curve_Collider(
+				x,
+				y,
+				Math.abs(xScale) + Math.abs(xWallOuter),
+				2,
+				quadrant
+			)
+		);
+
 			//adjust for next track
 			//change orientation
+			this.horizontal = !this.horizontal;
 			//change position
 			this.model_transform = this.model_transform
 				.times(Mat4.rotation(adjustAngle, 0, 0, 1)) 
