@@ -119,6 +119,8 @@ export class BaseMap extends Base_Scene {
 			() => {
 				if (!this.collided) {
 					this.vely += 0.002;
+				} else {
+					this.vely = this.vely > 0.02 ? 0.02 : this.vely;
 				}
 			},
 
@@ -262,6 +264,7 @@ export class BaseMap extends Base_Scene {
 				}
 				collided = true;
 				// return;
+				this.collided = true;
 			}
 		}
 
