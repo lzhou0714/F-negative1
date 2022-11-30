@@ -108,6 +108,7 @@ export class Base_Scene extends Scene {
 			kart: new Shape_From_File('../assets/kart/kart.obj'),
 			coin: new Shape_From_File('../assets/collectibles/coin.obj'),
 			text: new Text_Line(1),
+			pole: new defs.Cylindrical_Tube(20, 20),
 		};
 
 		this.shapes.plane.arrays.texture_coord = this.shapes.plane.arrays.texture_coord.map(x => x.times(4))
@@ -119,6 +120,12 @@ export class Base_Scene extends Scene {
 				ambient: 0.4,
 				diffusivity: 0.6,
 				color: hex_color('#ffffff'),
+			}),
+			metal: new Material(new defs.Phong_Shader(), {
+				ambient: 0.8,
+				diffusivity: 1,
+				specularity: 0.8,
+				color: hex_color('#808080'),
 			}),
 			flat: new Material(new defs.Phong_Shader(), {
 				ambient: 1,
@@ -202,6 +209,13 @@ export class Base_Scene extends Scene {
 				diffusivity: 0,
 				specularity: 0,
 				texture: new Texture('assets/grass.png'),
+			}),
+			flag: new Material(new Textured_Flag(), {
+				color: hex_color('#000000'),
+				ambient: 1,
+				diffusivity: 0,
+				specularity: 0,
+				texture: new Texture('assets/flag.png'),
 			}),
 
 		};
