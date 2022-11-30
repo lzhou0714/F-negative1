@@ -54,6 +54,6 @@ export class Trigger_Collider extends Collider {
 			this.callback();
 		}
 
-		return { resx: newx, resy: newy };
+		return { resx: x, resy: y };
 	}
 }
