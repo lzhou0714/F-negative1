@@ -444,7 +444,7 @@ export class BaseMap extends Base_Scene {
 				new Box_Collider(
 					x - width - 1,
 					y - length - 1,
-					1.5,
+					2,
 					length * 2 + 5
 				)
 			);
@@ -453,7 +453,7 @@ export class BaseMap extends Base_Scene {
 				new Box_Collider(
 					x + width - 1,
 					y - length - 1,
-					1.5,
+					2,
 					length * 2 + 5
 				)
 			);
@@ -463,7 +463,7 @@ export class BaseMap extends Base_Scene {
 					x - length - 1,
 					y - width - 1,
 					length * 2 + 2,
-					1.5
+					2
 				)
 			);
 
@@ -472,7 +472,7 @@ export class BaseMap extends Base_Scene {
 					x - length - 1,
 					y + width - 1,
 					length * 2 + 2,
-					1.5
+					2
 				)
 			);
 		}
