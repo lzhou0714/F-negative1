@@ -29,105 +29,119 @@ export class GameMap extends BaseMap {
 	 * experimenting with matrix transformations.
 	 */
 
-	constructor() {
-		super();
-	}
-
 	draw_environment(context, program_state, model_transform) {
-		console.log(this.model_transform);
 		//surroundings
+		let grass_transform = model_transform
+			.times(Mat4.translation(0, 0, -0.5))
+			.times(Mat4.scale(500, 500, 1));
+		this.shapes.plane.draw(
+			context,
+			program_state,
+			grass_transform,
+			this.materials.grass
+		);
 		let sphereTransform = model_transform.times(
 			Mat4.scale(500, 500, 500)
 		);
-
 		this.shapes.sphere.draw(
 			context,
 			program_state,
 			sphereTransform,
-			this.materials.flat.override(hex_color('87CEEB'))
+			this.materials.flat.override(hex_color('87ceeb'))
 		);
 
 		// // left side straight track
-		let plane_transform = model_transform.times(
-			Mat4.rotation(-Math.PI, 0, 0, 1)
-		);
+		// let plane_transform = model_transform.times(
+		// 	Mat4.rotation(-Math.PI, 0, 0, 1)
+		// );
 
-		let straight1_transform = plane_transform.times(
-			Mat4.scale(10, 100, 1)
-		);
+		// let straight1_transform = plane_transform.times(
+		// 	Mat4.scale(10, 100, 1)
+		// );
 
-		this.shapes.plane.draw(
-			context,
-			program_state,
-			straight1_transform,
-			this.materials.road
-		);
+		// this.shapes.plane.draw(
+		// 	context,
+		// 	program_state,
+		// 	straight1_transform,
+		// 	this.materials.road
+		// );
 
-		// this.draw_road(context, program_state, 25, 50);
-		// this.draw_road(context, program_state, 25, 50);
-		let track1l_collider = new Box_Collider(-11, -101, 2, 202);
-		let track1r_collider = new Box_Collider(9, -101, 2, 202);
-		this.colliders[8] = track1l_collider;
-		this.colliders[9] = track1r_collider;
+		// this.draw_win(context, program_state);
+		this.draw_road(context, program_state, true);
+		// this.draw_road(context, program_state, 10, 10);
+		//r = turn right, l = turn left
+		this.draw_road(context, program_state, true);
+		// this.draw_curve(context, program_state, 'l');
+		this.draw_road(context, program_state, true);
+		this.draw_road(context, program_state, true);
+		this.draw_curve(context, program_state, 'l');
+		this.draw_curve(context, program_state, 'l');
+		this.draw_road(context, program_state, true);
+		// this.draw_curve(context, program_state, 'l');
+		
+		// let track1l_collider = new Box_Collider(-11, -101, 2, 202);
+		// let track1r_collider = new Box_Collider(9, -101, 2, 202);
+		// this.colliders[8] = track1l_collider;
+		// this.colliders[9] = track1r_collider;
 
 		// //curve front
-		let curve1_transform = model_transform
-			.times(Mat4.rotation(Math.PI, 0, 1, 0))
-			.times(Mat4.translation(-30, -100, 0))
-			.times(Mat4.scale(20, 20, 10));
-		this.shapes.curve.draw(
-			context,
-			program_state,
-			curve1_transform,
-			this.materials.curve
-		);
+		// let curve1_transform = model_transform
+		// 	.times(Mat4.rotation(Math.PI, 0, 1, 0))
+		// 	.times(Mat4.translation(-30, -100, 0))
+		// 	.times(Mat4.scale(20, 20, 10));
+		// this.shapes.curve.draw(
+		// 	context,
+		// 	program_state,
+		// 	curve1_transform,
+		// 	this.materials.road
+		// );
 
-		let curve1l_collider = new Curve_Collider(30, -100, 41, 2, 3);
-		let curve1r_collider = new Curve_Collider(30, -100, 41, 2, 4);
-		this.colliders[0] = curve1l_collider;
-		this.colliders[1] = curve1r_collider;
+		// let curve1l_collider = new Curve_Collider(30, -100, 41, 2, 3);
+		// let curve1r_collider = new Curve_Collider(30, -100, 41, 2, 4);
+		// this.colliders[0] = curve1l_collider;
+		// this.colliders[1] = curve1r_collider;
 
-		let curve2l_collider = new Curve_Collider(30, -100, 19, 2, 3);
-		let curve2r_collider = new Curve_Collider(30, -100, 19, 2, 4);
-		this.colliders[2] = curve2l_collider;
-		this.colliders[3] = curve2r_collider;
+		// let curve2l_collider = new Curve_Collider(30, -100, 19, 2, 3);
+		// let curve2r_collider = new Curve_Collider(30, -100, 19, 2, 4);
+		// this.colliders[2] = curve2l_collider;
+		// this.colliders[3] = curve2r_collider;
 
 		// //right side straight track
-		let straight2_transform = plane_transform.times(
-			Mat4.translation(-60, 0, 0).times(Mat4.scale(10, 100, 1))
-		);
-		this.shapes.plane.draw(
-			context,
-			program_state,
-			straight2_transform,
-			this.materials.road
-		);
-		let track2l_collider = new Box_Collider(49, -101, 2, 202);
-		let track2r_collider = new Box_Collider(69, -101, 2, 202);
-		this.colliders[10] = track2l_collider;
-		this.colliders[11] = track2r_collider;
+		// let straight2_transform = plane_transform.times(
+		// 	Mat4.translation(-60, 0, 0).times(Mat4.scale(10, 100, 1))
+		// );
+		// this.shapes.plane.draw(
+		// 	context,
+		// 	program_state,
+		// 	straight2_transform,
+		// 	this.materials.road
+		// );
+		// let track2l_collider = new Box_Collider(49, -101, 2, 202);
+		// let track2r_collider = new Box_Collider(69, -101, 2, 202);
+		// this.colliders[10] = track2l_collider;
+		// this.colliders[11] = track2r_collider;
 
 		// //curve back
-		let curve2_transform = model_transform
-			.times(Mat4.rotation(Math.PI, 0, 0, 1))
-			.times(Mat4.rotation(Math.PI, 0, 1, 0))
-			.times(Mat4.translation(30, -100, 0))
-			.times(Mat4.scale(20, 20, 10));
-		this.shapes.curve.draw(
-			context,
-			program_state,
-			curve2_transform,
-			this.materials.curve
-		);
+		// let curve2_transform = model_transform
+		// 	.times(Mat4.rotation(Math.PI, 0, 0, 1))
+		// 	.times(Mat4.rotation(Math.PI, 0, 1, 0))
+		// 	.times(Mat4.translation(30, -100, 0))
+		// 	.times(Mat4.scale(20, 20, 10));
+		// this.shapes.curve.draw(
+		// 	context,
+		// 	program_state,
+		// 	curve2_transform,
+		// 	this.materials.road
+		// );
 
-		let curve3l_collider = new Curve_Collider(30, 100, 41, 2, 2);
-		let curve3r_collider = new Curve_Collider(30, 100, 41, 2, 1);
-		this.colliders[4] = curve3l_collider;
-		this.colliders[5] = curve3r_collider;
+		// let curve3l_collider = new Curve_Collider(30, 100, 41, 2, 2);
+		// let curve3r_collider = new Curve_Collider(30, 100, 41, 2, 1);
+		// this.colliders[4] = curve3l_collider;
+		// this.colliders[5] = curve3r_collider;
 
-		let curve4l_collider = new Curve_Collider(30, 100, 19, 2, 2);
-		let curve4r_collider = new Curve_Collider(30, 100, 19, 2, 1);
-		this.colliders[6] = curve4l_collider;
-		this.colliders[7] = curve4r_collider;
+		// let curve4l_collider = new Curve_Collider(30, 100, 19, 2, 2);
+		// let curve4r_collider = new Curve_Collider(30, 100, 19, 2, 1);
+		// this.colliders[6] = curve4l_collider;
+		// this.colliders[7] = curve4r_collider;
 	}
 }

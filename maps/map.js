@@ -662,5 +662,6 @@ export class BaseMap extends Base_Scene {
 
 		this.model_transform = Mat4.identity();
 		this.road_counter = 0;
+		
 	}
 }
