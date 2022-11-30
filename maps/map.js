@@ -146,10 +146,15 @@ export class BaseMap extends Base_Scene {
 		this.addHoldKey(
 			'd',
 			() => {
-				this.rotx -= Math.PI / 32;
+				this.rotx -= Math.PI / 24 * (1 - 1.5 * this.vely);
 				if (this.vely > 0) {
 					this.vely -= 0.00075;
 					if (this.vely < 0) {
+						this.vely = 0;
+					}
+				} else if (this.vely < 0) {
+					this.vely += 0.00075;
+					if (this.vely > 0) {
 						this.vely = 0;
 					}
 				}
@@ -160,7 +165,7 @@ export class BaseMap extends Base_Scene {
 		this.addHoldKey(
 			'a',
 			() => {
-				this.rotx += Math.PI / 32;
+				this.rotx += Math.PI / 24 * (1 - 1.5 * this.vely);
 				if (this.vely > 0) {
 					this.vely -= 0.00075;
 					if (this.vely < 0) {
@@ -285,7 +290,7 @@ export class BaseMap extends Base_Scene {
 		this.vely = Math.max(Math.min(this.vely, 0.06), -0.01);
 
 		// Linear Interpolation (for smoothing)
-		let lerp_factor = 0.03;
+		let lerp_factor = 0.02;
 		let lerp_rotx =
 			this.lastrotx * (1 - lerp_factor) + this.rotx * lerp_factor;
 
