@@ -66,14 +66,14 @@ export class BaseMap extends Base_Scene {
 		this.road_counter = 0;
 		this.collided = false;
 		// Key presses
+		this.lap = 1;
 		this.keyListeners = {};
 
 		// Transformation matrix for building roads
 		this.model_transform = Mat4.identity();
 
 		this.trigger_count = 1;
-		this.trigger_check = { 0: false };
-
+		this.trigger_check = { 0: true };
 		// This sets up traction for the car
 		// If w or d is pressed ignore traction
 		window.setInterval(() => {
@@ -255,18 +255,16 @@ export class BaseMap extends Base_Scene {
 		let len = this.colliders.length;
 		let collided = false;
 		this.collided = false;
-		
+
 		for (let i = 0; i < len; i++) {
 			// console.log(this.colliders[i]);
 			let res = this.colliders[i].check_collision(newx, newy);
 
 			if (res.resx != newx || res.resy != newy) {
-				if (this.x == newx || true) {
-					this.x = res.resx;
-				}
-				if (this.y == newy || true) {
-					this.y = res.resy;
-				}
+				this.x = res.resx;
+
+				this.y = res.resy;
+
 				collided = true;
 				// return;
 				console.log(this.colliders[i]);
@@ -301,11 +299,7 @@ export class BaseMap extends Base_Scene {
 			program_state.animation_delta_time *
 			Math.cos(lerp_rotx);
 
-		// Actual movement happens - Collision detection will occur here
-		//this.x += deltax;
-		//this.y += deltay;
 		this.move_with_collision(deltax, deltay);
-		// this.z += this.velz * program_state.animation_delta_time
 
 		model_transform = Mat4.identity();
 		model_transform = model_transform.times(
@@ -330,13 +324,10 @@ export class BaseMap extends Base_Scene {
 			);
 		}
 
-		// program_state.set_camera(model_transform.times(Mat4.translation(15, 0, -10)));
-
 		let camFollowx = -1 * Math.sin(-1 * lerp_rotx);
 		let camFollowy = -1 * Math.cos(lerp_rotx);
 		let camFollowDistance = 16;
 
-		// look_at(P_eye, P_ref, P_top)
 		let init_pos = Mat4.look_at(
 			vec3(
 				this.x + camFollowx * camFollowDistance,
@@ -347,11 +338,9 @@ export class BaseMap extends Base_Scene {
 			vec3(0, 0, 1)
 		);
 
-		///////////COMMENTED OUT TO SEE TRACK////////////////
 		program_state.set_camera(init_pos);
 
 		this.lastrotx = lerp_rotx;
-		// program_state.set_camera(model_transform.times(Mat4.translation(0, 5, -10)).times(Mat4.look_at(vec3(0, 5, 20), vec3(0, 0, 0), vec3(0, 1, 0))));
 	}
 
 	draw_coins(context, program_state) {
@@ -418,9 +407,23 @@ export class BaseMap extends Base_Scene {
 			const z =
 				temp_model_transform[2][temp_model_transform.length - 1];
 
-			this.colliders.push(
-				new Trigger_Collider(x - 12.5, y, 25, 1, callback)
-			);
+			const temp = this.trigger_count;
+			const trigger = () => {
+				this.trigger_check[temp] = this.trigger_check[temp - 1];
+				console.log(this.trigger_check);
+			};
+
+			if (this.horizontal) {
+				this.colliders.push(
+					new Trigger_Collider(y, x - 12.5, 25, 1, trigger)
+				);
+			} else {
+				this.colliders.push(
+					new Trigger_Collider(x - 12.5, y, 25, 1, trigger)
+				);
+			}
+
+			this.trigger_count += 1;
 		}
 
 		this.model_transform = this.model_transform.times(
@@ -586,12 +589,34 @@ export class BaseMap extends Base_Scene {
 		const z =
 			temp_model_transform[2][temp_model_transform.length - 1];
 
-		this.colliders.push(new Trigger_Collider(x - 12.5, y, 25, 1));
+		const trigger = () => {
+			console.log(this.trigger_check);
+			const keys = Object.keys(this.trigger_check);
+			console.log(keys);
+			if (
+				keys.length > 2 &&
+				this.trigger_check[keys[keys.length - 1]]
+			) {
+				console.log(`lap ${this.lap} finished`);
+				const laps = document.querySelector('.laps');
+				console.log(laps);
+				this.lap += 1;
+				laps.textContent = `Laps: ${this.lap}/3`;
+				this.trigger_check = { 0: true };
+				this.trigger_count = 1;
+				if (this.lap == 3) {
+					console.log('You Win');
+				}
+			}
+		};
+
+		this.colliders.push(
+			new Trigger_Collider(x - 12.5, y, 25, 1, trigger)
+		);
 		this.materials.road = prev;
 	}
 
 	draw_curve(context, program_state, direction) {
-
 		// console.log("drawing");
 		let xScale,
 			xTrans,
@@ -602,7 +627,6 @@ export class BaseMap extends Base_Scene {
 			quadrant;
 
 		if (direction == 'r') {
-			//turn right config
 			xTrans = 30;
 			xScale = 20;
 			xWallOuter = 21;
@@ -610,7 +634,6 @@ export class BaseMap extends Base_Scene {
 			adjustAngle = -Math.PI / 2;
 			adjustX = -30;
 		} else {
-			//turn leftw config
 			xTrans = -30;
 			xScale = -20;
 			xWallOuter = -21;
@@ -727,6 +750,9 @@ export class BaseMap extends Base_Scene {
 		this.model_transform = Mat4.identity();
 		this.road_counter = 0;
 		this.colliders = [];
+
+		this.trigger_count = 1;
+
 		this.mapOrientation = 0;
 		this.horizontal = false;
 	}
