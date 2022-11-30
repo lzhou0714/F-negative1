@@ -2,7 +2,7 @@ import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Curve_Collider } from '../colliders/CurveCollider.js';
 import { Box_Collider } from '../colliders/BoxCollider.js';
 import { Base_Scene } from './base-scene.js';
-
+import { makeTimer } from '../util/setTimer.js';
 const {
 	Vector,
 	Vector3,
@@ -34,6 +34,7 @@ export class BaseMap extends Base_Scene {
 		this.outline = false;
 		this.sway = true;
 
+		makeTimer(180);
 		// Transform
 
 		this.x = 0;
@@ -662,5 +663,6 @@ export class BaseMap extends Base_Scene {
 
 		this.model_transform = Mat4.identity();
 		this.road_counter = 0;
+		this.colliders = [];
 	}
 }

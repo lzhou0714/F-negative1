@@ -34,7 +34,6 @@ export class GameMap extends BaseMap {
 	}
 
 	draw_environment(context, program_state, model_transform) {
-		console.log(this.model_transform);
 		//surroundings
 		let sphereTransform = model_transform.times(
 			Mat4.scale(500, 500, 500)
