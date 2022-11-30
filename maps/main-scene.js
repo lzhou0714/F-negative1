@@ -37,8 +37,6 @@ const map_number = urlParams.get('map_number')
 	? urlParams.get('map_number')
 	: 1;
 
-let timeLeft = 180;
-
 const { GameMap } = await import('./map' + map_number + '.js');
 
 const Minimal_Webgl_Demo = defs.Minimal_Webgl_Demo;
@@ -48,7 +46,7 @@ Object.assign(defs, { Transforms_Sandbox }, { GameMap });
 // ******************** End extra step
 
 // (Can define Main_Scene's class here)
-
+window.lap = 1;
 const Main_Scene = GameMap;
 const Additional_Scenes = [];
 
