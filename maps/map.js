@@ -500,9 +500,9 @@ export class BaseMap extends Base_Scene {
 
 		this.colliders.push(
 			new Box_Collider(
-				x,
+				x-12.5,
 				y,
-				20,
+				25,
 				4
 			)
 		);
