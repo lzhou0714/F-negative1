@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Fira+Code:wght@300;400;700&family=Red+Hat+Mono&family=Roboto+Mono&display=swap');
 
 .scoreboard {
-	background: lightblue;
+	background: rgba(173, 216, 230, 0.6);
 	z-index: 1;
 	position: absolute;
 	font-family: Audiowide;
-	font-size: 3rem;
+	font-size: 2rem;
 	top: 0%;
-	margin-left: 1rem;
 	padding: 1rem;
+	border-radius: 0rem 0rem 1rem 0rem;
 }
 
 .scoreboard span {

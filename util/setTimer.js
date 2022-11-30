@@ -7,7 +7,7 @@ export const makeTimer = (time) => {
 
 		// let modal = document.getElementById('myModal');
 
-		modal.style.display = 'block';
+		window.location = '/index.html';
 		// When the user clicks the button, open the modal
 	};
 

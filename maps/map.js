@@ -207,7 +207,7 @@ export class BaseMap extends Base_Scene {
 			.times(Mat4.translation(-1, 1.5, 0))
 			.times(Mat4.rotation(angle, 45, 0, 1))
 			.times(Mat4.translation(1, 1.5, 0))
-			.times(Mat4.scale(1, 1.5, 1)); // Scale the size (Req 7)
+			.times(Mat4.scale(1, 1.5, 1));
 
 		this.shapes.triangle.draw(
 			context,
@@ -645,27 +645,6 @@ export class BaseMap extends Base_Scene {
 			program_state,
 			this.model_transform.times(Mat4.scale(xWallInner, -10, 1)),
 			this.materials.curved_wall
-		);
-
-		const x =
-			this.model_transform[0][this.model_transform.length - 1];
-		const y =
-			this.model_transform[1][this.model_transform.length - 1];
-		const z =
-			this.model_transform[2][this.model_transform.length - 1];
-
-		this.colliders.push(
-			new Curve_Collider(x, y, Math.abs(xScale) - 1, 2, quadrant)
-		);
-
-		this.colliders.push(
-			new Curve_Collider(
-				x,
-				y,
-				Math.abs(xScale) + Math.abs(xWallOuter),
-				2,
-				quadrant
-			)
 		);
 
 		//adjust for next track
