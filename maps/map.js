@@ -631,7 +631,7 @@ export class BaseMap extends Base_Scene {
 		};
 
 		this.colliders.push(
-			new Trigger_Collider(x - 12.5, y, 25, 1, trigger)
+			new Trigger_Collider(x - 10, y, 20, 1, trigger)
 		);
 		this.materials.road = prev;
 	}
