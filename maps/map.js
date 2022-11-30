@@ -254,9 +254,12 @@ export class BaseMap extends Base_Scene {
 			let res = this.colliders[i].check_collision(newx, newy);
 
 			if (res.resx != newx || res.resy != newy) {
-				this.collided = true;
-				this.x = res.resx;
-				this.y = res.resy;
+				if (this.x == newx || true) {
+					this.x = res.resx;
+				}
+				if (this.y == newy || true) {
+					this.y = res.resy;
+				}
 				collided = true;
 				// return;
 			}
