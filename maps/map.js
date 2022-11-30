@@ -71,6 +71,9 @@ export class BaseMap extends Base_Scene {
 		// Transformation matrix for building roads
 		this.model_transform = Mat4.identity();
 
+		this.trigger_count = 1;
+		this.trigger_check = { 0: false };
+
 		// This sets up traction for the car
 		// If w or d is pressed ignore traction
 		window.setInterval(() => {
@@ -393,6 +396,7 @@ export class BaseMap extends Base_Scene {
 		program_state,
 		coins = false,
 		trigger = false,
+		callback = () => {},
 		width = 10,
 		length = 10
 	) {
@@ -402,7 +406,7 @@ export class BaseMap extends Base_Scene {
 
 		if (trigger) {
 			let temp_model_transform = this.model_transform.times(
-				Mat4.translation(0, -10, 1)
+				Mat4.translation(0, 10, 1)
 			);
 			const x =
 				temp_model_transform[0][temp_model_transform.length - 1];
@@ -411,7 +415,9 @@ export class BaseMap extends Base_Scene {
 			const z =
 				temp_model_transform[2][temp_model_transform.length - 1];
 
-			this.colliders.push(new Trigger_Collider(x - 12.5, y, 25, 1));
+			this.colliders.push(
+				new Trigger_Collider(x - 12.5, y, 25, 1, callback)
+			);
 		}
 
 		this.model_transform = this.model_transform.times(
