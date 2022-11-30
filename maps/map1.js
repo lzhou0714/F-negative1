@@ -39,7 +39,7 @@ export class GameMap extends BaseMap {
 			program_state,
 			grass_transform,
 			this.materials.grass
-			);
+		);
 		let sphereTransform = model_transform.times(
 			Mat4.scale(500, 500, 500)
 		);
@@ -66,14 +66,14 @@ export class GameMap extends BaseMap {
 		// 	this.materials.road
 		// );
 
-		this.draw_road(context, program_state, 10, 10);
+		this.draw_road(context, program_state, true);
 		// this.draw_road(context, program_state, 10, 10);
 		//r = turn right, l = turn left
 		this.draw_curve(context, program_state, 'l');
-		this.draw_road(context, program_state, 10, 10);
-		this.draw_road(context, program_state, 10, 10);
+		this.draw_road(context, program_state, true);
+		this.draw_road(context, program_state);
 		this.draw_curve(context, program_state, 'r');
-		this.draw_road(context, program_state, 10, 10);
+		this.draw_road(context, program_state, true);
 		// this.draw_road(context, program_state, 10, 10);
 
 		// let track1l_collider = new Box_Collider(-11, -101, 2, 202);
