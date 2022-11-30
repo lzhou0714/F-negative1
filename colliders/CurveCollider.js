@@ -2,13 +2,14 @@ import { Collider } from './Collider.js';
 
 export class Curve_Collider extends Collider {
 	// Note - cartesian quadrants: 1 = top right, 2 = top left, 3 = bot left, 4 = bot right
-	constructor(x, y, radius, thickness, quadrant) {
+	constructor(x, y, radius, thickness, quadrant, snapMode = 0) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.r = radius; // How big the curve is
 		this.t = thickness; // How thick the curve line itself is
 		this.quad = quadrant;
+		this.snapMode = snapMode;
 	}
 
 	check_collision(x, y) {
@@ -40,19 +41,32 @@ export class Curve_Collider extends Collider {
 			// Collided
 			let ux = (x - this.x) / distance;
 			let uy = (y - this.y) / distance;
-			if (this.r - distance < 0) {
-				// Outside the curve
+			if (this.snapMode == 2) {  // Snap to outer
 				return {
 					resx: ux * (this.r + this.t) + this.x,
 					resy: uy * (this.r + this.t) + this.y,
 				};
-			} else {
-				// Inside the curve
+			} else if (this.snapMode == 1) {  // Snap to inner
 				return {
 					resx: ux * (this.r - this.t) + this.x,
 					resy: uy * (this.r - this.t) + this.y,
 				};
+			} else {  // Snap normally
+				if (this.r - distance < 0) {
+					// Outside the curve
+					return {
+						resx: ux * (this.r + this.t) + this.x,
+						resy: uy * (this.r + this.t) + this.y,
+					};
+				} else {
+					// Inside the curve
+					return {
+						resx: ux * (this.r - this.t) + this.x,
+						resy: uy * (this.r - this.t) + this.y,
+					};
+				}
 			}
+
 		} else {
 			return { resx: x, resy: y };
 		}

@@ -680,7 +680,7 @@ export class BaseMap extends Base_Scene {
 			this.model_transform[2][this.model_transform.length - 1];
 
 		this.colliders.push(
-			new Curve_Collider(x, y, Math.abs(xScale) - 1, 2, quadrant)
+			new Curve_Collider(x, y, Math.abs(xScale) - 1, 2, quadrant, 2)
 		);
 
 		this.colliders.push(
@@ -689,7 +689,8 @@ export class BaseMap extends Base_Scene {
 				y,
 				Math.abs(xScale) + Math.abs(xWallOuter),
 				2,
-				quadrant
+				quadrant,
+				1
 			)
 		);
 
