@@ -66,7 +66,6 @@ export class GameMap extends BaseMap {
 		// 	this.materials.road
 		// );
 
-		// this.draw_win(context, program_state);
 		this.draw_road(context, program_state, true);
 		// this.draw_road(context, program_state, 10, 10);
 		//r = turn right, l = turn left
@@ -75,11 +74,26 @@ export class GameMap extends BaseMap {
 		this.draw_road(context, program_state);
 		this.draw_curve(context, program_state, 'r');
 		this.draw_road(context, program_state, true);
-		this.draw_road(context, program_state, 10, 10);
+		this.draw_road(context, program_state);
 		this.draw_curve(context, program_state, 'r');
-		this.draw_road(context, program_state, 10, 10);
+		this.draw_road(context, program_state);
 		this.draw_curve(context, program_state, 'l');
-
+		this.draw_road(context, program_state);
+		this.draw_curve(context, program_state, 'r');
+		this.draw_road(context, program_state);
+		this.draw_curve(context, program_state, 'r');
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_road(context, program_state);
+		this.draw_curve(context, program_state, 'r');
+		this.draw_curve(context, program_state, 'r');
 		// let track1l_collider = new Box_Collider(-11, -101, 2, 202);
 		// let track1r_collider = new Box_Collider(9, -101, 2, 202);
 		// this.colliders[8] = track1l_collider;
