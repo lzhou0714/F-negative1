@@ -255,7 +255,7 @@ export class BaseMap extends Base_Scene {
 		let len = this.colliders.length;
 		let collided = false;
 		this.collided = false;
-
+		
 		for (let i = 0; i < len; i++) {
 			// console.log(this.colliders[i]);
 			let res = this.colliders[i].check_collision(newx, newy);
@@ -269,7 +269,10 @@ export class BaseMap extends Base_Scene {
 				}
 				collided = true;
 				// return;
+				console.log(this.colliders[i]);
+				console.log(this.colliders);
 				this.collided = true;
+				return;
 			}
 		}
 
@@ -588,6 +591,8 @@ export class BaseMap extends Base_Scene {
 	}
 
 	draw_curve(context, program_state, direction) {
+
+		// console.log("drawing");
 		let xScale,
 			xTrans,
 			adjustAngle,
@@ -722,5 +727,7 @@ export class BaseMap extends Base_Scene {
 		this.model_transform = Mat4.identity();
 		this.road_counter = 0;
 		this.colliders = [];
+		this.mapOrientation = 0;
+		this.horizontal = false;
 	}
 }
