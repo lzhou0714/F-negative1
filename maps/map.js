@@ -29,13 +29,18 @@ export class BaseMap extends Base_Scene {
 	 * experimenting with matrix transformations.
 	 */
 
-	constructor() {
+	constructor(sound = '../assets/Undertale_Megalovania.mp3') {
 		super();
+
+		// Sound
+		this.map_sound = new Audio(sound); // buffers automatically when created
+		this.map_sound.play();
+
 		this.set_colors();
 		this.outline = false;
 		this.sway = true;
 
-		this.timer = makeTimer(120);
+		this.timer = makeTimer(320);
 		// Transform
 
 		this.x = 0;
@@ -146,7 +151,7 @@ export class BaseMap extends Base_Scene {
 		this.addHoldKey(
 			'd',
 			() => {
-				this.rotx -= Math.PI / 24 * (1 - 1.5 * this.vely);
+				this.rotx -= (Math.PI / 24) * (1 - 1.5 * this.vely);
 				if (this.vely > 0) {
 					this.vely -= 0.00075;
 					if (this.vely < 0) {
@@ -165,7 +170,7 @@ export class BaseMap extends Base_Scene {
 		this.addHoldKey(
 			'a',
 			() => {
-				this.rotx += Math.PI / 24 * (1 - 1.5 * this.vely);
+				this.rotx += (Math.PI / 24) * (1 - 1.5 * this.vely);
 				if (this.vely > 0) {
 					this.vely -= 0.00075;
 					if (this.vely < 0) {
