@@ -251,3 +251,43 @@ export class Texture_Road extends Textured_Phong {
             } `;
         }
     }
+
+
+    export class Texture_Flag extends Textured_Phong {
+        // TODO:  Modify the shader below (right now it's just the same fragment shader as Textured_Phong) for requirement #6.
+        fragment_glsl_code() {
+            return this.shared_glsl_code() + `
+                varying vec2 f_tex_coord; //pre-interpolated texture coordinates
+                uniform sampler2D texture;
+                uniform float animation_time;
+                
+                void main(){
+                    // Sample the texture image in the correct place:
+                    //translate, reset every 2 units (1 cube)
+                    float slide = mod(animation_time,2.0)*2.0;
+                
+                    float xscale = 1.0/4.0;
+                    float yscale = 1.0/15.0;
+                    float ytrans = 0.35;
+                    mat4 size_mat = mat4(
+                        xscale ,0., 0., 0.,
+                        0., yscale, 0., 0.,
+                        0., 0., 1, 0.,
+                        0, ytrans, 0, 1.
+                    );
+                    vec4 new_coord = size_mat*vec4(f_tex_coord, 0., 1.);
+                    vec4 tex_color = texture2D( texture, new_coord.xy);
+
+                    
+
+                    // float x = mod(new_coord.x, 4.0);
+                    // float y = mod(new_coord.y, 2.0); //make strip repeat
+                
+                    if( tex_color.w < .01 ) discard;
+                                                                             // Compute an initial (ambient) color:
+                    gl_FragColor = vec4( ( tex_color.xyz + shape_color.xyz ) * ambient, shape_color.w * tex_color.w ); 
+                                                                             // Compute the final color with contributions from lights:
+                    gl_FragColor.xyz += phong_model_lights( normalize( N ), vertex_worldspace );
+            } `;
+        }
+    }

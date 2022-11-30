@@ -519,7 +519,7 @@ export class BaseMap extends Base_Scene {
 		let flag_transform = model_transform
 			.times(Mat4.rotation(Math.PI/2,1, 0, 0))
 			.times(Mat4.translation(0, 7, 0))
-			.times(Mat4.scale(1s0, 1, 1));
+			.times(Mat4.scale(10, 1.25, 1));
 		
 		this.shapes.pole.draw(
 			context,

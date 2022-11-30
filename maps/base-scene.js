@@ -1,7 +1,7 @@
 import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Shape_From_File } from '../tiny-graphics-stuff/obj-file-demo.js';
 import { Text_Line } from '../tiny-graphics-stuff/text-demo.js';
-import { Texture_Road, Texture_Curve,Texture_Curve_Wall, Texture_grass, Texture_Win } from '../tiny-graphics-stuff/custom-textures.js';
+import { Texture_Road, Texture_Curve,Texture_Curve_Wall, Texture_grass, Texture_Win, Texture_Flag} from '../tiny-graphics-stuff/custom-textures.js';
 
 
 const {
@@ -210,7 +210,7 @@ export class Base_Scene extends Scene {
 				specularity: 0,
 				texture: new Texture('assets/grass.png'),
 			}),
-			flag: new Material(new Textured_Flag(), {
+			flag: new Material(new Texture_Flag(), {
 				color: hex_color('#000000'),
 				ambient: 1,
 				diffusivity: 0,
