@@ -2,6 +2,7 @@ import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Curve_Collider } from '../colliders/CurveCollider.js';
 import { Box_Collider } from '../colliders/BoxCollider.js';
 import { Base_Scene } from './base-scene.js';
+import { Trigger_Collider } from '../colliders/TriggerCollider.js';
 
 const {
 	Vector,
@@ -54,6 +55,7 @@ export class BaseMap extends Base_Scene {
 		this.colliders = new Array();
 		this.mapOrientation = 0;
 		this.horizontal = false;
+		this.laps = 0;
 
 		// Coins
 		this.num_coins = 5;
@@ -558,7 +560,8 @@ export class BaseMap extends Base_Scene {
 		const z =
 			temp_model_transform[2][temp_model_transform.length - 1];
 
-		this.colliders.push(new Box_Collider(x - 12.5, y, 25, 4));
+		
+		this.colliders.push(new Trigger_Collider(x - 12.5, y, 25, 1));
 		this.materials.road = prev;
 		
 	
@@ -699,6 +702,5 @@ export class BaseMap extends Base_Scene {
 
 		this.model_transform = Mat4.identity();
 		this.road_counter = 0;
-		
 	}
 }
