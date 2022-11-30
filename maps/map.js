@@ -233,13 +233,6 @@ export class BaseMap extends Base_Scene {
 		}
 	}
 
-	// draw_text (context, program_state, model_transform) {
-	//     model_transform = model_transform.times(Mat4.rotation(Math.PI/2, 1, 0, 0))
-
-	//     let text = 'Score: ' + this.score;
-	//     this.shapes.text.set_string(text, context.context);
-	//     this.shapes.text.draw(context, program_state, model_transform, this.materials.text);
-	// }w
 
 	move_with_collision(deltax, deltay) {
 		let newx = this.x + deltax;
@@ -403,6 +396,34 @@ export class BaseMap extends Base_Scene {
 		this.model_transform = this.model_transform.times(
 			Mat4.translation(0, length, 0)
 		);
+	}
+
+	draw_win(context, program_state) {
+		let prev = this.materials.road;
+		this.materials.road = this.materials.win;
+		this.draw_road(context, program_state, 10, 10);
+
+		let temp_model_transform = this.model_transform.times(Mat4.translation(0, -10, 1));
+		
+		const x =
+			temp_model_transform[0][temp_model_transform.length - 1];
+		const y =
+			temp_model_transform[1][temp_model_transform.length - 1];
+		const z =
+			temp_model_transform[2][temp_model_transform.length - 1];
+
+		this.colliders.push(
+			new Box_Collider(
+				x,
+				y,
+				20,
+				4
+			)
+		);
+		this.materials.road = prev;
+	
+
+		
 	}
 
 	draw_curve(context, program_state,direction) {

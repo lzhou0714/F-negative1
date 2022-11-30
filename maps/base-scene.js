@@ -1,7 +1,7 @@
 import { defs, tiny } from '../tiny-graphics-stuff/common.js';
 import { Shape_From_File } from '../tiny-graphics-stuff/obj-file-demo.js';
 import { Text_Line } from '../tiny-graphics-stuff/text-demo.js';
-import { Texture_Road, Texture_Curve,Texture_Curve_Wall, Texture_grass } from '../tiny-graphics-stuff/custom-textures.js';
+import { Texture_Road, Texture_Curve,Texture_Curve_Wall, Texture_grass, Texture_Win } from '../tiny-graphics-stuff/custom-textures.js';
 
 
 const {
@@ -128,16 +128,23 @@ export class Base_Scene extends Scene {
 			}),
 
 			road: new Material(new Texture_Road(), {
-				color: hex_color('#ffffff'),
-				ambient: 0.5,
-				diffusivity: 0,
+				color: hex_color('#000000'),
+				ambient: 1,
+				diffusivity: 0.3,
 				specularity: 0,
 				texture: new Texture('assets/road2.png', "LINEAR_MIPMAP_LINEAR"),
 			}),
+			win: new Material(new Texture_Win(), {
+				color: hex_color('#000000'),
+				ambient: 1,
+				diffusivity: 0.3,
+				specularity: 0,
+				texture: new Texture('assets/road2.png', "LINEAR_MIPMAP_LINEAR"),
+			}), 
 			curve: new Material(new Texture_Curve(), {
-				color: hex_color('#ffffff'),
-				ambient: 0.5,
-				diffusivity: 0,
+				color: hex_color('#000000'),
+				ambient: 1,
+				diffusivity: 0.3,
 				specularity: 0,
 				texture: new Texture('assets/road2.png', "LINEAR_MIPMAP_LINEAR"),
 			}),
@@ -190,13 +197,12 @@ export class Base_Scene extends Scene {
 				texture: new Texture('assets/brick.png'),
 			}),
 			grass: new Material(new Texture_grass(), {
-				color: hex_color('#000000'),
+				color: hex_color('#303030'),
 				ambient: 1,
-				diffusivity: 0.25,
+				diffusivity: 0,
 				specularity: 0,
 				texture: new Texture('assets/grass.png'),
 			}),
-			
 
 		};
 
