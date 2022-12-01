@@ -74,6 +74,9 @@ export class BaseMap extends Base_Scene {
 		this.lap = 1;
 		this.keyListeners = {};
 
+		this.turnBuffer = 0;
+		this.brakePressed = false;
+
 		// Transformation matrix for building roads
 		this.model_transform = Mat4.identity();
 
@@ -151,7 +154,7 @@ export class BaseMap extends Base_Scene {
 		this.addHoldKey(
 			'd',
 			() => {
-				this.rotx -= (Math.PI / 24) * (1 - 1.5 * this.vely);
+				this.rotx -= (Math.PI / 24) * (1 - 1.5 * this.vely) * (1 + this.turnBuffer);
 				if (this.vely > 0) {
 					this.vely -= 0.00075;
 					if (this.vely < 0) {
@@ -170,7 +173,7 @@ export class BaseMap extends Base_Scene {
 		this.addHoldKey(
 			'a',
 			() => {
-				this.rotx += (Math.PI / 24) * (1 - 1.5 * this.vely);
+				this.rotx += (Math.PI / 24) * (1 - 1.5 * this.vely) * (1 + this.turnBuffer);
 				if (this.vely > 0) {
 					this.vely -= 0.00075;
 					if (this.vely < 0) {
@@ -310,6 +313,24 @@ export class BaseMap extends Base_Scene {
 		this.move_with_collision(deltax, deltay);
 
 		this.z = 0.5 + 0.035 * Math.sin(this.vely * program_state.animation_time);
+
+		// Extra handling at beginning of brake
+		if ('Brake' in this.keyListeners && this.keyListeners['Brake']) {
+			if (!this.brakePressed) {
+				this.turnBuffer = 0.8;
+				this.brakePressed = true;
+			} else {
+				if (this.turnBuffer > 0) {
+					this.turnBuffer -= 0.04;
+				} else {
+					this.turnBuffer = 0;
+				}
+			}
+			
+		} else {
+			this.brakePressed = false;
+			this.turnBuffer = 0;
+		}
 
 		model_transform = Mat4.identity();
 		model_transform = model_transform.times(
