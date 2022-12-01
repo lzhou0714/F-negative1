@@ -309,6 +309,8 @@ export class BaseMap extends Base_Scene {
 
 		this.move_with_collision(deltax, deltay);
 
+		this.z = 0.5 + 0.035 * Math.sin(this.vely * program_state.animation_time);
+
 		model_transform = Mat4.identity();
 		model_transform = model_transform.times(
 			Mat4.translation(this.x, this.y, this.z)
