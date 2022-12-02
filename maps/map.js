@@ -40,7 +40,7 @@ export class BaseMap extends Base_Scene {
 		this.outline = false;
 		this.sway = true;
 
-		this.timer = makeTimer(320);
+		this.timer = makeTimer(120);
 		// Transform
 
 		this.x = 0;
@@ -154,7 +154,10 @@ export class BaseMap extends Base_Scene {
 		this.addHoldKey(
 			'd',
 			() => {
-				this.rotx -= (Math.PI / 24) * (1 - 1.5 * this.vely) * (1 + this.turnBuffer);
+				this.rotx -=
+					(Math.PI / 24) *
+					(1 - 1.5 * this.vely) *
+					(1 + this.turnBuffer);
 				if (this.vely > 0) {
 					this.vely -= 0.00075;
 					if (this.vely < 0) {
@@ -173,7 +176,10 @@ export class BaseMap extends Base_Scene {
 		this.addHoldKey(
 			'a',
 			() => {
-				this.rotx += (Math.PI / 24) * (1 - 1.5 * this.vely) * (1 + this.turnBuffer);
+				this.rotx +=
+					(Math.PI / 24) *
+					(1 - 1.5 * this.vely) *
+					(1 + this.turnBuffer);
 				if (this.vely > 0) {
 					this.vely -= 0.00075;
 					if (this.vely < 0) {
@@ -312,7 +318,9 @@ export class BaseMap extends Base_Scene {
 
 		this.move_with_collision(deltax, deltay);
 
-		this.z = 0.5 + 0.035 * Math.sin(this.vely * program_state.animation_time);
+		this.z =
+			0.5 +
+			0.035 * Math.sin(this.vely * program_state.animation_time);
 
 		// Extra handling at beginning of brake
 		if ('Brake' in this.keyListeners && this.keyListeners['Brake']) {
@@ -326,7 +334,6 @@ export class BaseMap extends Base_Scene {
 					this.turnBuffer = 0;
 				}
 			}
-			
 		} else {
 			this.brakePressed = false;
 			this.turnBuffer = 0;
