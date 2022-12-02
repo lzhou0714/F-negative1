@@ -30,7 +30,7 @@ export class GameMap extends BaseMap {
 	 */
 
 	constructor() {
-		super();
+		super('../assets/rainbow_road.mp3');
 	}
 	draw_environment(context, program_state, model_transform) {
 		//surroundings
@@ -97,6 +97,5 @@ export class GameMap extends BaseMap {
 		this.draw_road(context, program_state);
 		this.draw_curve(context, program_state, 'r');
 		this.draw_curve(context, program_state, 'r');
-
 	}
 }

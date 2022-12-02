@@ -40,7 +40,7 @@ export class BaseMap extends Base_Scene {
 		this.outline = false;
 		this.sway = true;
 
-		this.timer = makeTimer(120);
+		this.timer = makeTimer(120, this.map_sound);
 		// Transform
 
 		this.x = 0;
@@ -679,6 +679,10 @@ export class BaseMap extends Base_Scene {
 				this.trigger_check = { 0: true };
 				this.trigger_count = 1;
 				if (this.lap == 4) {
+					this.map_sound.pause();
+					const victory = new Audio('../assets/victory.mp3');
+					victory.play();
+
 					let modal = document.getElementById('myModal');
 					let score = document.querySelector('.final-score');
 					let time = document.querySelector('.time');

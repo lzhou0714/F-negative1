@@ -1,9 +1,14 @@
-export const makeTimer = (time) => {
+export const makeTimer = (time, audio) => {
 	let timeLeft = time;
 	const timer = document.querySelector('.time-left');
 
 	const gameOver = () => {
-		clearInterval(timer);
+		clearInterval(timerInterval);
+
+		audio.pause();
+
+		const defeat_sound = new Audio('../assets/defeat.mp3');
+		defeat_sound.play();
 
 		const defeat = document.querySelector('.modal-defeat');
 		defeat.style.display = 'block';

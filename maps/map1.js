@@ -30,7 +30,7 @@ export class GameMap extends BaseMap {
 	 */
 
 	constructor() {
-		super();
+		super('../assets/baby_park.mp3');
 	}
 	draw_environment(context, program_state, model_transform) {
 		//surroundings
