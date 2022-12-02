@@ -236,7 +236,7 @@ export class Base_Scene extends Scene {
 			Math.PI / 4,
 			context.width / context.height,
 			1,
-			700
+			1000
 		);
 
 		// *** Lights: *** Values of vector or point lights.
